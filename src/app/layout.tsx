@@ -9,13 +9,13 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Electric Relic — Turn a Solana Token Into a Living NFT World",
+  title: "Electric Relic — Pump Coins, Now Collectible",
   description:
-    "Launch and trade a classic SPL coin on Pump, then connect it to a reversible Metaplex Core NFT world.",
+    "Create a reversible NFT collection tied to a compatible Pump coin.",
   openGraph: {
-    title: "Electric Relic — One Token. Two Forms.",
+    title: "Electric Relic — Pump Coins, Now Collectible",
     description:
-      "Turn a Solana token into a living NFT world through a transparent, reversible reserve.",
+      "Move between a compatible Pump coin and its collectible form.",
     images: [
       {
         url: "/images/electric-relic/og-social.png",
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Electric Relic — One Token. Two Forms.",
-    description: "Turn a Solana token into a living NFT world.",
+    title: "Electric Relic — Pump Coins, Now Collectible",
+    description: "Move between a compatible Pump coin and its collectible form.",
     images: ["/images/electric-relic/og-social.png"],
   },
   icons: {
