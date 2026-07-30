@@ -1,0 +1,329 @@
+{
+  "_template": "NOT DEPLOYABLE — replace every angle-bracket value, pass every required gate, change decision to GO, and validate before signing",
+  "_architectureStatus": "NO-GO — MPL-Hybrid EscrowV2 + RecipeV1 path requires an independent review of the exact deployed program before any flagship mainnet write",
+  "_approvalMessage": "Sign UTF-8 exactly: ELECTRIC_RELIC_LAUNCH_COVENANT_V3\\nWORLD_ID:<WORLD_ID>\\nCLUSTER:mainnet-beta\\nARTIFACT_URI:<IPFS_OR_AR_URI>\\nMANIFEST_SHA256:<LOWERCASE_SHA256>\\nAPPROVED_AT:<ISO_8601_TIMESTAMP>",
+  "schemaVersion": "3.0",
+  "world": {
+    "id": "<WORLD_ID>",
+    "slug": "<WORLD_SLUG>",
+    "name": "<WORLD_NAME>",
+    "isCanary": "<BOOLEAN>"
+  },
+  "protocol": {
+    "productVersion": "ELECTRIC_RELIC_V1",
+    "integrationModel": "MPL_HYBRID_ESCROW_V2_RECIPE_V1",
+    "program": "MPL4o4wMzndgh8T1NVDxELQCj5UQfYTYEkabX3wNKtb",
+    "programDataAccount": "<UPGRADEABLE_PROGRAM_DATA_ACCOUNT>",
+    "upgradeAuthority": "<UPGRADE_AUTHORITY_OR_NULL>",
+    "executableSha256": "<LOWERCASE_SHA256>",
+    "publishedNpmClient": {
+      "name": "@metaplex-foundation/mpl-hybrid",
+      "version": "0.2.0",
+      "v2Compatible": false,
+      "writePathStatus": "PROHIBITED"
+    },
+    "v2ClientArtifact": {
+      "distribution": "VENDORED_OR_OFFICIALLY_PUBLISHED",
+      "officialSourceCommit": "68b564efcb4988f69e55435a7ed097a149a16bf3",
+      "artifactUri": "<IMMUTABLE_ARTIFACT_URI>",
+      "artifactSha256": "<LOWERCASE_SHA256>",
+      "idlSha256": "<LOWERCASE_SHA256>",
+      "requiredExports": [
+        "EscrowV2",
+        "RecipeV1",
+        "initEscrowV2",
+        "initRecipeV1",
+        "captureV2",
+        "releaseV2",
+        "updateRecipeV1"
+      ],
+      "requiredExportsVerified": false,
+      "instructionDiscriminatorsVerified": false,
+      "accountMetasVerified": false,
+      "programIdVerified": false
+    },
+    "accountTypes": {
+      "escrow": "EscrowV2",
+      "recipe": "RecipeV1"
+    },
+    "instructions": {
+      "initializeEscrow": "initEscrowV2",
+      "initializeRecipe": "initRecipeV1",
+      "awaken": "captureV2",
+      "release": "releaseV2"
+    },
+    "independentReview": {
+      "status": "PENDING",
+      "reviewer": "<INDEPENDENT_REVIEWER>",
+      "reportUri": "<IPFS_OR_AR_URI>",
+      "reportSha256": "<LOWERCASE_SHA256>",
+      "reviewedProgramSlot": "<SLOT_INTEGER>",
+      "unresolvedCriticalFindings": "<INTEGER>",
+      "unresolvedHighFindings": "<INTEGER>"
+    }
+  },
+  "token": {
+    "mint": "<CLASSIC_SPL_MINT>",
+    "tokenProgramOwner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "decimals": 6,
+    "supplyAtomic": "<ATOMIC_INTEGER>",
+    "mintAuthority": null,
+    "freezeAuthority": null,
+    "verifiedAtSlot": "<SLOT_INTEGER>",
+    "distributionDisclosure": "<PUBLIC_DISTRIBUTION_DESCRIPTION>"
+  },
+  "pump": {
+    "sdkVersion": "1.36.0",
+    "creationPath": "LEGACY_CLASSIC",
+    "deprecationStatus": "DEPRECATED_NO_AUTOMATIC_FALLBACK",
+    "createSignature": "<SOLANA_SIGNATURE>",
+    "bondingCurve": "<CANONICAL_PUMP_CURVE>",
+    "associatedBondingCurve": "<CANONICAL_CURVE_TOKEN_ACCOUNT>",
+    "pumpSwapPool": "<CANONICAL_POOL_OR_NULL>",
+    "marketState": "<BONDING_CURVE_OR_MIGRATION_PENDING_OR_GRADUATED_PUMPSWAP>",
+    "freshPreflight": {
+      "cluster": "mainnet-beta",
+      "rpcOrigin": "<APPROVED_RPC_ORIGIN>",
+      "simulatedAt": "<ISO_8601_TIMESTAMP>",
+      "slot": "<SLOT_INTEGER>",
+      "result": "PASSED",
+      "createV2Present": false,
+      "unexpectedProgramsOrAccountsPresent": false
+    }
+  },
+  "collection": {
+    "address": "<METAPLEX_CORE_COLLECTION>",
+    "maxSupply": "<INTEGER>",
+    "metadataBaseUri": "<IPFS_OR_AR_URI>",
+    "metadataFirstIndex": 0,
+    "metadataLastIndex": "<MAX_SUPPLY_MINUS_ONE>",
+    "metadataArchiveSha256": "<LOWERCASE_SHA256>",
+    "metadataArchiveImmutable": true,
+    "updateAuthority": "<DEDICATED_WORLD_AUTHORITY>",
+    "updateDelegate": {
+      "required": "<BOOLEAN_FALSE_FOR_NO_REROLL_CANARY>",
+      "authorityType": "<ADDRESS_OR_NONE>",
+      "address": "<RECIPE_V1_ADDRESS_OR_NULL>",
+      "additionalDelegates": [],
+      "immutableMetadataPluginPresent": false
+    }
+  },
+  "economy": {
+    "backingPerNftAtomic": "<ATOMIC_INTEGER>",
+    "maximumActiveNftCount": "<INTEGER>",
+    "reserveExposureAtomic": "<BACKING_TIMES_MAXIMUM_ACTIVE_NFT_COUNT>",
+    "projectFees": {
+      "captureTokenAtomic": "<ATOMIC_INTEGER_CANARY_MUST_BE_0>",
+      "releaseTokenAtomic": "0",
+      "captureSolLamports": "<ATOMIC_INTEGER_CANARY_MUST_BE_0>",
+      "releaseSolLamports": "0"
+    },
+    "protocolFeeDisclosure": "Recheck the current MPL-Hybrid V2 protocol fee against the exact deployed program immediately before signing",
+    "recipePath": {
+      "noRerollMetadata": "<BOOLEAN_CANARY_MUST_BE_TRUE>",
+      "blockCapture": false,
+      "blockRelease": false,
+      "burnOnCapture": false,
+      "burnOnRelease": false
+    }
+  },
+  "reserve": {
+    "tokenInvariant": "escrowTokenReserveAtomic >= backingPerNftAtomic * activeNftCount",
+    "inventoryInvariant": "escrowNftInventoryCount + activeNftCount = eligibleMintedCollectionCount",
+    "countedTokenAccount": "<ESCROW_V2_CLASSIC_SPL_TOKEN_ACCOUNT>",
+    "excludedBalances": [
+      "PUMP_BONDING_CURVE",
+      "PUMP_MIGRATION_RESERVE",
+      "PUMPSWAP_POOL",
+      "TREASURY",
+      "PROJECT_FEE_ACCOUNT"
+    ],
+    "initialState": {
+      "eligibleMintedCollectionCount": "<INTEGER>",
+      "escrowNftInventoryCount": "<INTEGER>",
+      "activeNftCount": "<INTEGER>",
+      "escrowTokenReserveAtomic": "<ATOMIC_INTEGER>",
+      "requiredReserveAtomic": "<ATOMIC_INTEGER>"
+    },
+    "latestVerifiedSnapshot": {
+      "slot": "<SLOT_INTEGER>",
+      "observedAt": "<ISO_8601_TIMESTAMP>",
+      "escrowTokenReserveAtomic": "<ATOMIC_INTEGER>",
+      "requiredReserveAtomic": "<ATOMIC_INTEGER>",
+      "escrowNftInventoryCount": "<INTEGER>",
+      "activeNftCount": "<INTEGER>",
+      "fullyBacked": "<BOOLEAN>"
+    }
+  },
+  "deployment": {
+    "cluster": "mainnet-beta",
+    "worldAuthority": "<DEDICATED_WORLD_AUTHORITY>",
+    "authorityReusedAcrossWorlds": false,
+    "escrowV2": {
+      "address": "<ESCROW_V2_ADDRESS>",
+      "pdaSeeds": [
+        "escrow",
+        "<DEDICATED_WORLD_AUTHORITY>"
+      ],
+      "authority": "<DEDICATED_WORLD_AUTHORITY>",
+      "initializeSignature": "<SOLANA_SIGNATURE>"
+    },
+    "recipeV1": {
+      "address": "<RECIPE_V1_ADDRESS>",
+      "pdaSeeds": [
+        "recipe",
+        "<METAPLEX_CORE_COLLECTION>"
+      ],
+      "authority": "<DEDICATED_WORLD_AUTHORITY>",
+      "token": "<CLASSIC_SPL_MINT>",
+      "collection": "<METAPLEX_CORE_COLLECTION>",
+      "initializeSignature": "<SOLANA_SIGNATURE>"
+    },
+    "escrowTokenAccount": "<ESCROW_V2_CLASSIC_SPL_TOKEN_ACCOUNT>",
+    "projectFeeTokenAccount": "<DISCLOSED_PROJECT_FEE_CLASSIC_SPL_TOKEN_ACCOUNT>",
+    "assetFundingSignatures": [
+      "<SOLANA_SIGNATURE>"
+    ]
+  },
+  "authorities": {
+    "policy": "DEDICATED_WORLD_2_OF_3_MULTISIG",
+    "worldAuthority": "<DEDICATED_WORLD_AUTHORITY>",
+    "collectionUpdateAuthority": "<DEDICATED_WORLD_AUTHORITY>",
+    "escrowV2Authority": "<DEDICATED_WORLD_AUTHORITY>",
+    "recipeV1Authority": "<DEDICATED_WORLD_AUTHORITY>",
+    "feeLocation": "<DISCLOSED_PROJECT_FEE_WALLET>",
+    "members": [
+      "<MEMBER_1>",
+      "<MEMBER_2>",
+      "<MEMBER_3>"
+    ],
+    "approvalSignatures": [
+      {
+        "signer": "<MEMBER_1>",
+        "signature": "<DETACHED_MANIFEST_SIGNATURE>"
+      },
+      {
+        "signer": "<MEMBER_2>",
+        "signature": "<DETACHED_MANIFEST_SIGNATURE>"
+      }
+    ]
+  },
+  "canary": {
+    "required": true,
+    "separateWorld": true,
+    "worldId": "<CANARY_WORLD_ID>",
+    "assetCount": "<INTEGER_FROM_1_THROUGH_3>",
+    "maximumSpendLamports": "<ATOMIC_INTEGER>",
+    "backingPerNftAtomic": "<SMALL_ATOMIC_INTEGER>",
+    "dedicatedAuthority": "<CANARY_ONLY_AUTHORITY>",
+    "projectFeesZero": true,
+    "burnsDisabled": true,
+    "rerollDisabled": true,
+    "status": "NOT_RUN",
+    "awakenSignatures": [
+      "<SOLANA_SIGNATURE>"
+    ],
+    "releaseSignatures": [
+      "<SOLANA_SIGNATURE>"
+    ],
+    "reserveInvariantVerifiedAtSlot": "<SLOT_INTEGER>",
+    "inventoryInvariantVerifiedAtSlot": "<SLOT_INTEGER>",
+    "observationWindowEndedAt": "<ISO_8601_TIMESTAMP>"
+  },
+  "reviews": {
+    "contractReview": {
+      "status": "PENDING",
+      "evidenceUri": "<IPFS_OR_AR_URI>"
+    },
+    "legalReview": {
+      "status": "PENDING",
+      "evidenceUri": "<IPFS_OR_AR_URI>"
+    },
+    "operationsRunbookReview": {
+      "status": "PENDING",
+      "evidenceUri": "<IPFS_OR_AR_URI>"
+    }
+  },
+  "goNoGo": {
+    "decision": "NO_GO",
+    "decidedAt": "<ISO_8601_TIMESTAMP>",
+    "gates": [
+      {
+        "id": "PUMP_LEGACY_CLASSIC_PREFLIGHT",
+        "required": true,
+        "passed": false,
+        "evidence": "<URI_OR_SIGNATURE>"
+      },
+      {
+        "id": "CLASSIC_MINT_POST_CONFIRMATION",
+        "required": true,
+        "passed": false,
+        "evidence": "<URI_OR_SLOT>"
+      },
+      {
+        "id": "EXACT_V2_PROGRAM_INDEPENDENTLY_REVIEWED",
+        "required": true,
+        "passed": false,
+        "evidence": "<AUDIT_REPORT_URI>"
+      },
+      {
+        "id": "VERIFIED_V2_CLIENT_ARTIFACT_AND_DISCRIMINATORS",
+        "required": true,
+        "passed": false,
+        "evidence": "<CLIENT_REPRODUCTION_REPORT_URI>"
+      },
+      {
+        "id": "DEDICATED_WORLD_AUTHORITY_VERIFIED",
+        "required": true,
+        "passed": false,
+        "evidence": "<URI_OR_SLOT>"
+      },
+      {
+        "id": "RECIPE_FEES_MATCH_POLICY_NO_BURNS_AND_PATH_MATCHES_COVENANT",
+        "required": true,
+        "passed": false,
+        "evidence": "<URI_OR_SLOT>"
+      },
+      {
+        "id": "DEVNET_100_ROUND_TRIPS_AND_24H_SOAK",
+        "required": true,
+        "passed": false,
+        "evidence": "<REPORT_URI>"
+      },
+      {
+        "id": "MAINNET_1_TO_3_ASSET_CANARY_PASSED",
+        "required": true,
+        "passed": false,
+        "evidence": "<CANARY_REPORT_URI>"
+      },
+      {
+        "id": "RESERVE_AND_INVENTORY_RECONCILED",
+        "required": true,
+        "passed": false,
+        "evidence": "<URI_OR_SLOT>"
+      },
+      {
+        "id": "RECOVERY_AND_FAILURE_MATRIX_PASSED",
+        "required": true,
+        "passed": false,
+        "evidence": "<REPORT_URI>"
+      },
+      {
+        "id": "LEGAL_AND_OPERATIONS_APPROVED",
+        "required": true,
+        "passed": false,
+        "evidence": "<EVIDENCE_URI>"
+      }
+    ]
+  },
+  "marketLinks": {
+    "pump": "<HTTPS_PUMP_COIN_URL>",
+    "dex": "<HTTPS_URL>",
+    "nftMarketplace": "<HTTPS_URL>"
+  },
+  "approval": {
+    "approvedAt": "<ISO_8601_TIMESTAMP>",
+    "manifestUri": "<IPFS_OR_AR_URI>",
+    "manifestSha256": "<LOWERCASE_SHA256>"
+  }
+}

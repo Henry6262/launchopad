@@ -1,0 +1,52 @@
+@font-face {
+  font-family: "Mona Sans";
+  src: url("/fonts/Mona-Sans.var.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 200 900;
+}
+
+@font-face {
+  font-family: "Rebond";
+  src: url("/fonts/RebondGrotesque.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 400 900;
+}
+
+:root {
+  color-scheme: dark;
+  background: #040604;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+  background: #040604;
+  scrollbar-color: rgba(183, 255, 50, 0.42) #040604;
+  scrollbar-width: thin;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #040604;
+  color: #f2f5ea;
+  font-family: "Mona Sans", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: #b7ff32;
+  color: #040604;
+}

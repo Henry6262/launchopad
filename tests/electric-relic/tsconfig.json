@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "rootDir": "../..",
+    "noEmit": true
+  },
+  "include": [
+    "../../src/lib/electric-relic/helius-activity.server.ts",
+    "../../src/lib/electric-relic/hybrid-v2.ts",
+    "../../src/lib/electric-relic/ipfs-upload.server.ts",
+    "../../src/lib/electric-relic/math.ts",
+    "../../src/lib/electric-relic/mpl-hybrid-v2-readonly.server.ts",
+    "../../src/lib/electric-relic/request-guard.server.ts",
+    "../../src/lib/electric-relic/seed.ts",
+    "../../src/lib/electric-relic/server-only.d.ts",
+    "../../src/lib/electric-relic/types.ts",
+    "../../src/lib/electric-relic/upgradeable-program-verification.server.ts",
+    "../../src/lib/electric-relic/validation.ts",
+    "./foundation.test.ts",
+    "./hybrid-v2.test.ts",
+    "./upgradeable-program-verification.test.ts"
+  ]
+}
