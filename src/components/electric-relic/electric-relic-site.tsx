@@ -24,24 +24,6 @@ const formImages = [
   "/images/electric-relic/form-05.webp",
 ] as const
 
-const actions = [
-  {
-    name: "AWAKEN",
-    equation: "TOKEN → NFT",
-    copy: "Tokens enter escrow. One collectible leaves.",
-  },
-  {
-    name: "RELEASE",
-    equation: "NFT → TOKEN",
-    copy: "The collectible returns. Its token backing comes back.",
-  },
-  {
-    name: "EVOLVE",
-    equation: "NFT → NFT",
-    copy: "Release, then awaken again for another eligible form.",
-  },
-] as const
-
 function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
     <span className={`er-lockup ${compact ? "is-compact" : ""}`}>
@@ -136,7 +118,7 @@ function Hero() {
         aria-hidden="true"
       >
         <Image
-          src="/images/electric-relic/threshold.webp"
+          src="/images/electric-relic/hero-foundry-v2.webp"
           alt=""
           fill
           priority
@@ -173,19 +155,6 @@ function Hero() {
           </a>
         </div>
       </motion.div>
-      <div className="er2-hero__equation" aria-label="Pump coin exchanges with a Core NFT">
-        <span>
-          <small>TRADE ON PUMP</small>
-          <b>$COIN</b>
-        </span>
-        <i>
-          <ArrowRightLeft size={24} />
-        </i>
-        <span>
-          <small>AWAKEN HERE</small>
-          <b>CORE NFT</b>
-        </span>
-      </div>
       <div className="er2-hero__status">
         <i />
         PRIVATE BETA · MAINNET WRITES LOCKED
@@ -195,51 +164,80 @@ function Hero() {
 }
 
 function Loop() {
-  const [selected, setSelected] = useState(0)
   const reduceMotion = useReducedMotion()
 
   return (
-    <section className="er2-loop" id="loop">
-      <div className="er2-loop__art" aria-hidden="true">
-        <Image
-          src="/images/electric-relic/covenant-chamber.webp"
-          alt=""
-          fill
-          sizes="100vw"
-        />
-      </div>
-      <div className="er2-loop__shade" aria-hidden="true" />
+    <section className="er2-loop er2-loop--clear" id="loop">
+      <div className="er2-loop-clear__glow" aria-hidden="true" />
       <motion.div
-        className="er2-section-copy"
+        className="er2-section-copy er2-loop-clear__heading"
         initial={reduceMotion ? false : { opacity: 0, y: 26 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.35 }}
       >
-        <span>THE LOOP</span>
+        <span>HOW IT WORKS</span>
         <h2>
           ONE TOKEN.
-          <em>THREE MOVES.</em>
+          <em>TWO STATES.</em>
         </h2>
+        <p>Pump is the market. Electric Relic is the reversible bridge.</p>
       </motion.div>
-      <div className="er2-loop__actions" role="tablist" aria-label="Hybrid actions">
-        {actions.map((action, index) => (
-          <button
-            type="button"
-            role="tab"
-            aria-selected={selected === index}
-            className={selected === index ? "is-active" : ""}
-            key={action.name}
-            onClick={() => setSelected(index)}
-          >
-            <small>{action.equation}</small>
-            <strong>{action.name}</strong>
-            <span>{action.copy}</span>
-          </button>
-        ))}
+      <motion.div
+        className="er2-state-flow"
+        initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ delay: 0.12 }}
+      >
+        <div className="er2-state er2-state--coin">
+          <small>STATE 01</small>
+          <span className="er2-state__coin">$</span>
+          <strong>PUMP TOKEN</strong>
+          <p>Trades on Pump</p>
+        </div>
+        <div className="er2-state-bridge">
+          <span>CONFIGURED BACKING</span>
+          <div aria-hidden="true">
+            <i />
+            <b>
+              <ArrowRightLeft size={23} />
+            </b>
+          </div>
+          <strong>X TOKENS ↔ 1 NFT</strong>
+        </div>
+        <div className="er2-state er2-state--nft">
+          <small>STATE 02</small>
+          <span className="er2-state__nft">
+            <Image
+              src="/images/electric-relic/form-04.webp"
+              alt="Example collectible form"
+              fill
+              sizes="180px"
+            />
+          </span>
+          <strong>CORE NFT</strong>
+          <p>Trades on NFT markets</p>
+        </div>
+      </motion.div>
+      <div className="er2-primitives">
+        <div>
+          <span>AWAKEN</span>
+          <strong>LOCK X TOKENS</strong>
+          <ArrowRight size={20} />
+          <strong>RECEIVE 1 NFT</strong>
+        </div>
+        <div>
+          <span>RELEASE</span>
+          <strong>RETURN 1 NFT</strong>
+          <ArrowRight size={20} />
+          <strong>RECOVER X TOKENS</strong>
+        </div>
       </div>
-      <div className="er2-loop__selected" aria-live="polite">
-        <b>{actions[selected].name}</b>
-        <span>{actions[selected].copy}</span>
+      <div className="er2-evolve-note">
+        <span>OPTIONAL</span>
+        <b>EVOLVE</b>
+        <strong>RELEASE + AWAKEN</strong>
+        <p>Two swaps. Another eligible form—not a guaranteed upgrade.</p>
       </div>
     </section>
   )
