@@ -26,6 +26,7 @@
     "./api-contract.test.ts",
     "./foundation.test.ts",
     "./hybrid-v2.test.ts",
+    "./hybrid-v2-vendor.test.ts",
     "./upgradeable-program-verification.test.ts"
   ]
 }

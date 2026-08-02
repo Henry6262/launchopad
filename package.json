@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "tsc --noEmit",
     "check": "npm run lint && npm run test:electric-relic",
-    "test:electric-relic": "NODE_PATH=tests/electric-relic/stubs tsx --test tests/electric-relic/*.test.ts"
+    "test:electric-relic": "NODE_PATH=tests/electric-relic/stubs tsx --test tests/electric-relic/*.test.ts",
+    "vendor:hybrid-v2": "node scripts/vendor-mpl-hybrid-v2.mjs",
+    "canary": "tsx scripts/electric-relic-devnet-canary.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.31.1",

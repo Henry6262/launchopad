@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0",
+  "repository": "https://github.com/metaplex-foundation/mpl-hybrid.git",
+  "commit": "68b564efcb4988f69e55435a7ed097a149a16bf3",
+  "sourcePath": "clients/js/src",
+  "sourceCommittedAt": "2026-05-19T14:24:01-04:00",
+  "idlSha256": "c30969f832d744db74110324d4b6f852bdef5117ef28db0b6f47bedd1effb213",
+  "sourceSha256": "4fdcd9a6e3b147342728a5a74beafe24f496f058e7b31643cf1169f0244fbec6",
+  "requiredExports": [
+    "captureV2",
+    "releaseV2",
+    "initEscrowV2",
+    "initRecipeV1"
+  ],
+  "mainnetApproved": false,
+  "disclosure": "Exact generated source import for devnet canary review. This artifact is not an audit or a mainnet authorization."
+}
