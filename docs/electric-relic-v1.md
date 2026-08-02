@@ -13,15 +13,14 @@ passes and the signed covenant records the evidence.
 
 ## Product surface
 
-- `/launchpad` — six-beat product and Founding Season landing experience.
-- `/launchpad/world/the-hollow` — truthful flagship model with rites,
+- `/` — focused founding-preview landing experience.
+- `/world/the-hollow` — truthful flagship blueprint with rites,
   concept forms, chain-reference status, and recovery state.
-- `/launchpad/create` — five-step creator application with browser-local
-  drafts, wallet-signed ownership proof, atomic reserve simulation, and
-  sequential package checks.
-- `/launchpad/pump` — official Pump SDK compatibility lab. It builds and
-  simulates the intentionally selected classic-SPL launch lane, but returns no
-  transaction bytes and cannot broadcast.
+- `/create` — five-step creator application with browser-local drafts, atomic
+  reserve simulation, sequential package checks, and an explicit local review
+  packet fallback when server intake is unavailable.
+- `/pump` — read-only compatibility checker for an existing Pump mint. It reads
+  the mint owner and canonical Pump accounts without a wallet or transaction.
 - `/api/launchpad/pump/preflight` — access-gated and rate-limited Pump
   legacy-create simulation on devnet or mainnet. Deployed builds fail closed
   unless `ELECTRIC_RELIC_PUMP_PREFLIGHT_ACCESS_KEY` is configured.

@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   CircleAlert,
   Copy,
+  Download,
   FileCheck2,
   ImageIcon,
   LoaderCircle,
@@ -35,12 +36,13 @@ import {
   type CreatorApplicationDraft,
   type CreatorApplicationSubmission,
 } from "@/lib/electric-relic"
+import { ELECTRIC_RELIC_API_PATHS } from "@/lib/electric-relic/api-paths"
 import { buildCreatorApplicationProofMessage } from "@/lib/electric-relic/creator-proof"
 import ProductMark from "./product-mark"
 import styles from "./creator-studio.module.css"
 
 const STORAGE_KEY = "electric-relic:creator-draft:v2"
-const applicationEndpoint = "/api/launchpad/applications"
+const applicationEndpoint = ELECTRIC_RELIC_API_PATHS.applications
 const evolveProtocolFeeSol = (
   Number(electricRelicProtocol.documentedSwapFeeSol) * 2
 ).toFixed(3)
@@ -110,7 +112,14 @@ const steps = [
   },
 ] as const
 
-type SubmitState = "idle" | "submitting" | "sent" | "unavailable" | "failed"
+type SubmitState =
+  | "idle"
+  | "submitting"
+  | "sent"
+  | "exported"
+  | "unavailable"
+  | "failed"
+type ApplicationMode = "checking" | "server" | "export"
 type AssetPackageState =
   | {
       status: "NOT_RUN" | "CHECKING" | "FAILED"
@@ -229,9 +238,39 @@ export default function CreatorStudio() {
   const [copied, setCopied] = useState(false)
   const [submitState, setSubmitState] = useState<SubmitState>("idle")
   const [submitMessage, setSubmitMessage] = useState("")
+  const [applicationMode, setApplicationMode] =
+    useState<ApplicationMode>("checking")
   const [assetPackage, setAssetPackage] =
     useState<AssetPackageState>(emptyAssetPackage)
   const walletAddress = publicKey?.toBase58() ?? null
+
+  useEffect(() => {
+    let active = true
+
+    void fetch(applicationEndpoint, {
+      method: "GET",
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        const payload = (await response.json()) as {
+          ok?: boolean
+          data?: { mode?: "SERVER" | "EXPORT_ONLY" }
+        }
+        if (!active) return
+        setApplicationMode(
+          response.ok && payload.ok && payload.data?.mode === "SERVER"
+            ? "server"
+            : "export"
+        )
+      })
+      .catch(() => {
+        if (active) setApplicationMode("export")
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     try {
@@ -380,8 +419,9 @@ export default function CreatorStudio() {
     step === 4
       ? allModelStepsValid &&
         draft.consentToReview &&
-        walletAddress !== null &&
-        signMessage !== undefined
+        applicationMode !== "checking" &&
+        (applicationMode === "export" ||
+          (walletAddress !== null && signMessage !== undefined))
       : stepValidity[step]
 
   const validationMessage = useMemo(() => {
@@ -409,6 +449,28 @@ export default function CreatorStudio() {
     if (step === 2) {
       return "Use 1–499 forms, add art direction, then validate matching 0…N−1 artwork and JSON files."
     }
+    if (step === 4) {
+      if (!allModelStepsValid) {
+        const incomplete = steps
+          .slice(0, 4)
+          .filter((_, index) => !stepValidity[index])
+          .map((item) => item.label)
+          .join(", ")
+        return `Complete these sections first: ${incomplete || "APPLICATION"}.`
+      }
+      if (applicationMode === "checking") {
+        return "Checking the founding-beta intake mode."
+      }
+      if (!draft.consentToReview) {
+        return "Confirm consent to technical review."
+      }
+      if (applicationMode === "export") return ""
+      if (!walletAddress) return "Connect the public creator wallet."
+      if (!signMessage) {
+        return "Connect a Solana wallet that supports message signing."
+      }
+      return "Review the application before signing."
+    }
     if (!backingIsPossible) {
       return "The maximum backing allocation cannot exceed token supply."
     }
@@ -426,16 +488,6 @@ export default function CreatorStudio() {
     ) {
       return "Use non-negative project fees; SOL supports up to 9 decimal places."
     }
-    if (step === 4) {
-      if (!allModelStepsValid) {
-        return "Complete and validate every preceding step before submission."
-      }
-      if (!walletAddress) return "Connect the public creator wallet."
-      if (!signMessage) {
-        return "Connect a Solana wallet that supports message signing."
-      }
-      return "Confirm consent to technical review."
-    }
     return "Review the fixed backing rate."
   }, [
     backingIsPossible,
@@ -443,14 +495,16 @@ export default function CreatorStudio() {
     captureTokenFeeAtomic,
     captureSolFeeLamports,
     declaredSupplyAtomic,
+    draft.consentToReview,
     draft.tokenDecimals,
     draft.tokenSupply,
     draft.captureTokenFee,
-    draft.tokenDecimals,
     allModelStepsValid,
+    applicationMode,
     reserveExposureAtomic,
     signMessage,
     step,
+    stepValidity,
     stepIsValid,
     walletAddress,
   ])
@@ -486,6 +540,71 @@ export default function CreatorStudio() {
     } catch {
       setCopied(false)
     }
+  }
+
+  function downloadReviewPacket() {
+    const packet = {
+      schemaVersion: "electric-relic-creator-review.v1",
+      exportedAt: new Date().toISOString(),
+      status: "LOCAL_REVIEW_PACKET",
+      deploymentCreated: false,
+      creatorWallet: walletAddress,
+      contact: {
+        name: draft.contactName.trim(),
+        email: draft.contactEmail.trim().toLowerCase(),
+        xHandle: draft.xHandle.trim() || null,
+      },
+      project: {
+        worldName: draft.worldName.trim(),
+        family: draft.family.trim(),
+        summary: draft.summary.trim(),
+        websiteUrl: draft.websiteUrl.trim() || null,
+      },
+      token: {
+        symbol: normalizedSymbol,
+        mintAddress: draft.tokenMint.trim(),
+        declaredSupply: String(draft.tokenSupply),
+        decimals: draft.tokenDecimals,
+        rpcVerification: "PENDING",
+      },
+      forms: {
+        intendedSupply: draft.collectionSize,
+        artDirection: draft.artDirection.trim(),
+        artworkCount: assetPackage.artworkCount,
+        metadataCount: assetPackage.metadataCount,
+        localPackageSha256: assetPackage.packageIndexHash,
+        filesUploaded: false,
+      },
+      economy: {
+        equation,
+        backingPerNft: String(draft.backingPerNft),
+        reserveAtCap: String(reservedAtCap),
+        captureTokenFee: String(draft.captureTokenFee),
+        captureSolFee: draft.captureSolFee,
+        rerollEnabled: draft.rerollEnabled,
+      },
+      disclosures: [
+        "This packet is an application model, not a deployment.",
+        "Artwork and metadata remain on the creator device.",
+        "Token provenance, supply, authorities, reserve, and Hybrid compatibility remain pending operator review.",
+        "Awaken, Release, and Evolve remain unavailable until the canary and signed launch gates pass.",
+      ],
+    }
+    const filename = `${draft.worldName || "electric-relic-world"}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+    const blob = new Blob([JSON.stringify(packet, null, 2)], {
+      type: "application/json",
+    })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement("a")
+    anchor.href = url
+    anchor.download = `${filename || "electric-relic-world"}-review.json`
+    document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
+    URL.revokeObjectURL(url)
   }
 
   function resetDraft() {
@@ -634,6 +753,15 @@ export default function CreatorStudio() {
       return
     }
 
+    if (applicationMode === "export") {
+      downloadReviewPacket()
+      setSubmitState("exported")
+      setSubmitMessage(
+        "Review packet downloaded. No application, artwork, metadata, wallet signature, or transaction was sent to Electric Relic."
+      )
+      return
+    }
+
     setSubmitState("submitting")
     setSubmitMessage("")
 
@@ -770,7 +898,11 @@ export default function CreatorStudio() {
         <div className={styles.headerActions}>
           <span className={styles.backendStatus}>
             <i />
-            LOCAL DRAFT ACTIVE
+            {applicationMode === "server"
+              ? "APPLICATION INTAKE LIVE"
+              : applicationMode === "checking"
+                ? "CHECKING INTAKE"
+                : "EXPORT MODE · NO SERVER STORAGE"}
           </span>
           <WalletMultiButton />
           <button type="button" onClick={resetDraft}>
@@ -806,7 +938,11 @@ export default function CreatorStudio() {
               >
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <b>{item.label}</b>
-                {index < step ? <Check size={15} /> : <i />}
+                {index < 4 && stepValidity[index] ? (
+                  <Check size={15} />
+                ) : (
+                  <i />
+                )}
               </button>
             ))}
           </nav>
@@ -959,9 +1095,9 @@ export default function CreatorStudio() {
                   <WalletCards size={18} />
                   <p>
                     <b>THE CURATED V2 RECIPE LANE NEEDS CLASSIC SPL</b>
-                    Run the curated coin through the Pump Lab first. Modern
-                    create_v2 coins use Token-2022 and remain incompatible.
-                    A passing Pump simulation is only a candidate check; it
+                    Run the existing coin through the read-only Pump checker
+                    first. Token-2022 coins remain incompatible with the locked
+                    founding lane. A passing result is only the first gate; it
                     does not verify Hybrid safety.
                   </p>
                 </div>
@@ -1360,29 +1496,41 @@ export default function CreatorStudio() {
                   />
                   <span>
                     <b>I CONSENT TO TECHNICAL REVIEW</b>
-                    I understand this is an application only. Submission does
-                    not deploy contracts, create assets, reserve tokens, or
-                    guarantee approval. My wallet signs this application
-                    message; it does not sign a transaction.
+                    I understand this is an application only. It does not deploy
+                    contracts, create assets, reserve tokens, or guarantee
+                    approval. In export mode, the packet stays on this device.
                   </span>
                 </label>
-                <div className={styles.walletReceipt}>
-                  <WalletCards size={17} />
-                  <span>
-                    <b>CREATOR WALLET · MESSAGE SIGNATURE REQUIRED</b>
-                    {walletAddress ??
-                      "CONNECT A PUBLIC SOLANA WALLET · NO TRANSACTION"}
-                  </span>
-                </div>
+                {applicationMode === "export" ? (
+                  <div className={styles.walletReceipt}>
+                    <Download size={17} />
+                    <span>
+                      <b>LOCAL REVIEW PACKET · NO SERVER STORAGE</b>
+                      Download the validated model as JSON. Artwork and metadata
+                      stay on this device and no wallet signature is requested.
+                    </span>
+                  </div>
+                ) : (
+                  <div className={styles.walletReceipt}>
+                    <WalletCards size={17} />
+                    <span>
+                      <b>CREATOR WALLET · MESSAGE SIGNATURE REQUIRED</b>
+                      {walletAddress ??
+                        "CONNECT A PUBLIC SOLANA WALLET · NO TRANSACTION"}
+                    </span>
+                  </div>
+                )}
 
                 {submitState !== "idle" && submitState !== "submitting" && (
                   <div
                     className={`${styles.submitNotice} ${
-                      submitState === "sent" ? styles.submitSuccess : ""
+                      submitState === "sent" || submitState === "exported"
+                        ? styles.submitSuccess
+                        : ""
                     }`}
                     aria-live="polite"
                   >
-                    {submitState === "sent" ? (
+                    {submitState === "sent" || submitState === "exported" ? (
                       <Check size={18} />
                     ) : (
                       <CircleAlert size={18} />
@@ -1391,6 +1539,8 @@ export default function CreatorStudio() {
                       <b>
                         {submitState === "sent"
                           ? "APPLICATION RECEIVED"
+                          : submitState === "exported"
+                            ? "REVIEW PACKET EXPORTED"
                           : submitState === "unavailable"
                             ? "SUBMISSION UNAVAILABLE"
                             : "DELIVERY FAILED"}
@@ -1437,6 +1587,11 @@ export default function CreatorStudio() {
                   <>
                     SENDING
                     <LoaderCircle className={styles.spinner} size={16} />
+                  </>
+                ) : applicationMode === "export" ? (
+                  <>
+                    DOWNLOAD REVIEW PACKET
+                    <Download size={16} />
                   </>
                 ) : (
                   <>

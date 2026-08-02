@@ -3,7 +3,6 @@
 import Image from "next/image"
 import Link from "next/link"
 import {
-  ArrowDown,
   ArrowRight,
   ArrowRightLeft,
   ArrowUpRight,
@@ -62,9 +61,9 @@ function Header() {
         <a href="#create">CREATE</a>
       </nav>
       <div className="er2-header__actions">
-        <Link href="/pump">PUMP LAB</Link>
+        <Link href="/pump">CHECK A COIN</Link>
         <Link className="er2-header__launch" href="/create">
-          BUILD A WORLD
+          START APPLICATION
           <ArrowUpRight size={15} />
         </Link>
         <button
@@ -93,10 +92,10 @@ function Header() {
               FLAGSHIP <ArrowRight size={15} />
             </a>
             <Link href="/pump" onClick={() => setOpen(false)}>
-              PUMP LAB <ArrowRight size={15} />
+              CHECK A COIN <ArrowRight size={15} />
             </Link>
             <Link href="/create" onClick={() => setOpen(false)}>
-              BUILD A WORLD <ArrowRight size={15} />
+              START APPLICATION <ArrowRight size={15} />
             </Link>
           </motion.nav>
         )}
@@ -134,30 +133,30 @@ function Hero() {
       >
         <span className="er2-kicker">
           <i />
-          THE NFT LAYER FOR PUMP COINS
+          PUMP COINS → REVERSIBLE NFT WORLDS
         </span>
         <h1>
           PUMP COINS.
           <em>NOW COLLECTIBLE.</em>
         </h1>
         <p>
-          Create an NFT collection tied to a compatible Pump coin. Holders move
-          between the token and its collectible form.
+          Check a Pump coin, model its backing, and prepare a collectible World.
+          Holders move between the token and NFT states after the protocol canary.
         </p>
         <div className="er2-actions">
           <Link className="er2-button er2-button--primary" href="/create">
-            BUILD A WORLD
+            START APPLICATION
             <ArrowUpRight size={18} />
           </Link>
-          <a className="er2-button er2-button--ghost" href="#loop">
-            SEE HOW IT WORKS
-            <ArrowDown size={18} />
-          </a>
+          <Link className="er2-button er2-button--ghost" href="/pump">
+            CHECK A PUMP COIN
+            <ArrowRight size={18} />
+          </Link>
         </div>
       </motion.div>
       <div className="er2-hero__status">
         <i />
-        PRIVATE BETA · MAINNET WRITES LOCKED
+        FOUNDING PREVIEW · APPLICATION PACKETS OPEN · SWAPS AFTER CANARY
       </div>
     </section>
   )
@@ -262,7 +261,7 @@ function Flagship() {
         <span>FLAGSHIP WORLD · THE HOLLOW</span>
         <h2>
           200 FORMS.
-          <em>ONE PROOF.</em>
+          <em>ONE BLUEPRINT.</em>
         </h2>
       </motion.div>
       <div className="er2-gallery">
@@ -305,7 +304,7 @@ function Flagship() {
       <div className="er2-flagship__foot">
         <span>
           <i />
-          CONCEPT ART · CHAIN NOT CONNECTED
+          FLAGSHIP BLUEPRINT · CHAIN NOT CONNECTED
         </span>
         <Link href="/world/the-hollow">
           OPEN THE HOLLOW
@@ -336,23 +335,27 @@ function CreateWorld() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <span>CURATED CREATOR BETA</span>
+        <span>FOUNDING CREATOR BETA · 5 ASSISTED WORLDS</span>
         <h2>
-          BRING THE COIN.
+          CHECK THE COIN.
           <em>BUILD THE WORLD.</em>
         </h2>
         <div className="er2-create__needs">
-          <b><Check size={15} /> PUMP MINT</b>
+          <b><Check size={15} /> COMPATIBLE PUMP MINT</b>
           <b><Check size={15} /> FINISHED ART</b>
-          <b><Check size={15} /> WORLD ECONOMY</b>
+          <b><Check size={15} /> REVERSIBLE ECONOMY</b>
         </div>
+        <p className="er2-create__note">
+          Prepare the complete review packet now. Deployment begins only after
+          compatibility, reserve math, authorities, and the canary are approved.
+        </p>
         <div className="er2-actions">
           <Link className="er2-button er2-button--primary" href="/create">
-            APPLY TO LAUNCH
+            START APPLICATION
             <ArrowUpRight size={18} />
           </Link>
           <Link className="er2-button er2-button--ghost" href="/pump">
-            TEST A PUMP MINT
+            CHECK A PUMP COIN
             <ArrowRight size={18} />
           </Link>
         </div>
@@ -365,10 +368,10 @@ function Footer() {
   return (
     <footer className="er2-footer">
       <BrandMark />
-      <p>PUMP MARKET × REVERSIBLE NFT ESCROW</p>
+      <p>FOUNDING PREVIEW · MAINNET SWAPS LOCKED</p>
       <div>
         <a href="#loop">HOW IT WORKS</a>
-        <Link href="/pump">PUMP LAB</Link>
+        <Link href="/pump">CHECK A COIN</Link>
         <Link href="/create">CREATE</Link>
       </div>
     </footer>

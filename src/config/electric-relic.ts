@@ -2,7 +2,7 @@ export const electricRelicBrand = {
   name: "ELECTRIC RELIC",
   shortName: "ER",
   world: "THE HOLLOW",
-  tagline: "Turn your Solana token into a living NFT World.",
+  tagline: "Check the coin. Model the backing. Build the World.",
   description:
     "Launch and trade a coin on Pump, then connect the same verified classic SPL mint to a reversible Metaplex Core NFT World.",
 } as const
@@ -13,7 +13,7 @@ export const electricRelicPump = {
   sdkVersion: "1.36.0",
   creationPath: "LEGACY_CLASSIC",
   currentDefaultBlockedPath: "CREATE_V2_TOKEN_2022",
-  preflightPath: "/launchpad/pump",
+  preflightPath: "/pump",
   writesEnabled: false,
 } as const
 

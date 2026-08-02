@@ -181,7 +181,7 @@ export default function WorldDetail({
           <a href="#rites">RITES</a>
           <a href="#forms">CONCEPT FORMS</a>
           <a href="#covenant">STATUS</a>
-          <Link href="/pump">PUMP LAB</Link>
+          <Link href="/pump">CHECK A COIN</Link>
         </nav>
         <Link className={styles.buildLink} href="/create">
           APPLY WITH A TOKEN
@@ -209,7 +209,7 @@ export default function WorldDetail({
           </div>
 
           <p className={styles.family}>
-            FLAGSHIP REFERENCE MODEL / PUMP-FIRST
+            FLAGSHIP BLUEPRINT / PUMP-FIRST
           </p>
           <h1>{manifest.name}</h1>
           <p className={styles.heroSummary}>{manifest.description}</p>
@@ -379,7 +379,7 @@ export default function WorldDetail({
       <section className={styles.covenantSection} id="covenant">
         <div className={styles.covenantHeading}>
           <span>03 / DEPLOYMENT STATUS</span>
-          <h2>LOCAL CHECKS PASSED. THE CHAIN IS NOT CONNECTED.</h2>
+          <h2>BLUEPRINT CHECKS PASSED. THE CHAIN IS NOT CONNECTED.</h2>
           <p>
             Validated locally: schema, reserve arithmetic, and modeled
             Awaken/Release projections. No token, collection, escrow, or program
@@ -431,7 +431,7 @@ export default function WorldDetail({
       <footer className={styles.footer}>
         <ProductMark className={styles.brand} />
         <p>
-          PUMP-FIRST FLAGSHIP MODEL · CONCEPT ART ONLY
+          PUMP-FIRST FLAGSHIP BLUEPRINT · CONCEPT ART ONLY
           <span>MAINNET WRITES LOCKED · NO LIVE WORLD CONNECTED</span>
         </p>
         <div>

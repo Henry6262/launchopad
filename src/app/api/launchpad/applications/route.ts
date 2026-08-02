@@ -21,6 +21,24 @@ export const runtime = "nodejs"
 
 const MAX_REQUEST_BYTES = 64 * 1024
 
+export async function GET() {
+  const persistenceState = getCreatorApplicationPersistence()
+
+  return NextResponse.json(
+    {
+      ok: true,
+      data: {
+        mode: persistenceState.configured ? "SERVER" : "EXPORT_ONLY",
+      },
+    },
+    {
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    }
+  )
+}
+
 export async function POST(request: Request) {
   const rateLimit = consumePublicApiRateLimit(
     request,

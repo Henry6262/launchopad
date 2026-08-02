@@ -19,6 +19,7 @@ import {
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { FormEvent, useMemo, useState } from "react"
+import { ELECTRIC_RELIC_API_PATHS } from "@/lib/electric-relic/api-paths"
 import ProductMark from "./product-mark"
 import styles from "./pump-preflight-console.module.css"
 
@@ -109,7 +110,7 @@ export default function PumpPreflightConsole() {
     )
 
     try {
-      const response = await fetch("/api/pump/preflight", {
+      const response = await fetch(ELECTRIC_RELIC_API_PATHS.pumpPreflight, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

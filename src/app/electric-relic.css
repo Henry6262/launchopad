@@ -649,6 +649,14 @@
   color: var(--er-lime);
 }
 
+.er2-create__note {
+  max-width: 680px;
+  margin: 22px 0 0;
+  color: rgba(242, 245, 234, 0.66);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
 .er2-footer {
   display: grid;
   min-height: 150px;

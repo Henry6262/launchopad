@@ -11,11 +11,14 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Electric Relic — Pump Coins, Now Collectible",
   description:
-    "Create a reversible NFT collection tied to a compatible Pump coin.",
+    "Check a compatible Pump coin and prepare a reversible NFT World for Electric Relic's curated founding beta.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Electric Relic — Pump Coins, Now Collectible",
     description:
-      "Move between a compatible Pump coin and its collectible form.",
+      "Check the coin, model the backing, and prepare its collectible World.",
     images: [
       {
         url: "/images/electric-relic/og-social.png",
@@ -28,7 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Electric Relic — Pump Coins, Now Collectible",
-    description: "Move between a compatible Pump coin and its collectible form.",
+    description: "Check the coin, model the backing, and prepare its collectible World.",
     images: ["/images/electric-relic/og-social.png"],
   },
   icons: {

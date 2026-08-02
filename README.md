@@ -11,12 +11,18 @@ The public product explains three actions:
 
 ## Current status
 
-The interface, creator flow, Pump simulation-only preflight, signed manifest
-model, and read-only MPL-Hybrid V2 verification are implemented.
+The founding-preview interface, creator review-packet flow, read-only Pump mint
+checker, signed manifest model, and read-only MPL-Hybrid V2 verification are
+implemented. Creator applications fall back to a local JSON export when the
+server-side Supabase intake is not configured; the UI never labels that export
+as a submitted application.
 
 Mainnet transaction construction and broadcast remain intentionally disabled.
 The production gate requires the reviewed V2 client artifact, independent
 security review, devnet soak, and a separate 1–3 asset canary.
+
+The public `/pump` page inspects an existing mint. The deprecated Pump creation
+simulator remains an access-gated internal API and is not the public product.
 
 See:
 

@@ -11,6 +11,7 @@
     "noEmit": true
   },
   "include": [
+    "../../src/lib/electric-relic/api-paths.ts",
     "../../src/lib/electric-relic/helius-activity.server.ts",
     "../../src/lib/electric-relic/hybrid-v2.ts",
     "../../src/lib/electric-relic/ipfs-upload.server.ts",
@@ -22,6 +23,7 @@
     "../../src/lib/electric-relic/types.ts",
     "../../src/lib/electric-relic/upgradeable-program-verification.server.ts",
     "../../src/lib/electric-relic/validation.ts",
+    "./api-contract.test.ts",
     "./foundation.test.ts",
     "./hybrid-v2.test.ts",
     "./upgradeable-program-verification.test.ts"
