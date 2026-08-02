@@ -1,0 +1,12 @@
+{
+  "name": "Electric Relic Canary #0",
+  "symbol": "ERTEST",
+  "description": "The single valueless test form in Electric Relic's first reversible devnet canary.",
+  "image": "https://electric-relic.vercel.app/images/electric-relic/form-01.webp",
+  "external_url": "https://electric-relic.vercel.app/world/devnet-canary",
+  "attributes": [
+    { "trait_type": "Canary", "value": "Genesis" },
+    { "trait_type": "Network", "value": "Solana Devnet" },
+    { "trait_type": "Reroll", "value": "Disabled" }
+  ]
+}

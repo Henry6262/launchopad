@@ -1,0 +1,7 @@
+{
+  "name": "Electric Relic Devnet Canary",
+  "symbol": "ERTEST",
+  "description": "One test form used to prove Awaken and Release on Solana devnet. It has no mainnet value.",
+  "image": "https://electric-relic.vercel.app/images/electric-relic/form-01.webp",
+  "external_url": "https://electric-relic.vercel.app/world/devnet-canary"
+}
