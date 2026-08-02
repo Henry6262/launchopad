@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.0",
-  "publishedAt": "2026-08-02T18:21:55.509Z",
+  "publishedAt": "2026-08-02T19:07:57.853Z",
   "state": {
     "schemaVersion": "1.0",
     "cluster": "devnet",
     "rpcUrl": "https://api.devnet.solana.com",
     "genesisHash": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG",
     "createdAt": "2026-08-02T18:18:11.569Z",
-    "updatedAt": "2026-08-02T18:21:55.508Z",
+    "updatedAt": "2026-08-02T19:07:57.851Z",
     "operator": "E4k5NyvpzH6Kq7Ags9Ta4inWQLTrJfwtoZYxAwQyWXcj",
     "feeLocation": "E4k5NyvpzH6Kq7Ags9Ta4inWQLTrJfwtoZYxAwQyWXcj",
     "token": {
@@ -44,39 +44,17 @@
     "programObservation": {
       "programAddress": "MPL4o4wMzndgh8T1NVDxELQCj5UQfYTYEkabX3wNKtb",
       "programDataAddress": "9RRs8kE5eq1xno8G9mNG5vWGcYbDWRNjdoSnfvDWhjT3",
-      "observedSlot": "480737232",
+      "observedSlot": "480744776",
       "deployedSlot": "404350747",
       "upgradeAuthority": "mp14o4AQcmE5meFDxCscervMc1E4zyKEyDp3398PcwU",
       "executableSha256": "5f7dfb5ee22e6082b8eaf689c2f62eb97a671cc8a3f790f9cb8921959a707852",
       "executableBytes": 1600720
     },
-    "signatures": {
-      "CREATE_COLLECTION": [
-        "5eiTsWaQ5NCJudkVUbVmaxpG4hVTJMeKUawEcRUuhZi2BY5t28zuJvNUXAauytD1d4nyMaDasf36NPJFEWqqq3xA"
-      ],
-      "CREATE_ASSET": [
-        "64NGkXqVeUL8i8LG779Mj45f587xQM9YA5WAJVVRwkht76r6gUZj29b8dyLmHzPSDtLsqqRtiVFgpLFF3TufYdfd"
-      ],
-      "INIT_ESCROW": [
-        "3gM6svnx6XW4AkmF35wBzjaZ4DD1JLZZe2pmLHvrSkeCDyiLGKQ7sjxd2VBGZVgAHFkZhLhdEjZUcmMryrznKN82"
-      ],
-      "INIT_RECIPE": [
-        "xQkg21F8wQLFqnyQTyVNM8VQy3wi6JaMtDDbFzdMDU2rp5MwcuRKJ9Za5HNJAe4JU6tuq7Yo3W6tifqmbpVpufc"
-      ],
-      "FUND_ESCROW_ASSET": [
-        "H4vqTYN4yHqC8Z5FKdsMHg6tMFGH8ePm7Ze4c55uaBGY7GgXZAaA8pCDY5onNZtQYXKnjAvY29c3ssHPnFVC92u"
-      ],
-      "AWAKEN": [
-        "3srFA39o2ShTpvsKFSS6thK2hPDfx8jSpPBd3UYEZkv4PL9T28eAHeeaxo4Jbiu6rz9jZwWaoSRPNieypw4tsK85"
-      ],
-      "RELEASE": [
-        "635HqEoejPSQmv14J1ubnnrNQfSf9KmCKNffFnedzjvUcDQgktL2rwozEZ7K7vKs6vMxzgzrd7Pck47QTftrx763"
-      ]
-    },
+    "signatures": {},
     "pending": null,
     "lastSnapshot": {
-      "observedAt": "2026-08-02T18:21:55.400Z",
-      "slot": 480737232,
+      "observedAt": "2026-08-02T19:07:57.734Z",
+      "slot": 480744775,
       "assetAddress": "6juoirmCSgpaECDb11RHRKKktwmJ4ADzpQ3jCvT7m3kq",
       "assetOwner": "HK4Sr5TZ2AtxeDRUibBk8ppwvYVk9ffqdQ4GTKU7Mtoh",
       "assetAndReserveSameSlot": true,
@@ -93,8 +71,8 @@
     "disclosure": "Devnet-only evidence. The token and NFT have no mainnet value; the V2 source artifact is not mainnet-approved."
   },
   "snapshot": {
-    "observedAt": "2026-08-02T18:21:55.400Z",
-    "slot": 480737232,
+    "observedAt": "2026-08-02T19:07:57.734Z",
+    "slot": 480744775,
     "assetAddress": "6juoirmCSgpaECDb11RHRKKktwmJ4ADzpQ3jCvT7m3kq",
     "assetOwner": "HK4Sr5TZ2AtxeDRUibBk8ppwvYVk9ffqdQ4GTKU7Mtoh",
     "assetAndReserveSameSlot": true,
@@ -116,8 +94,76 @@
     "detail": "No pending signature is recorded."
   },
   "confirmationSummary": {
-    "awakenCount": 1,
-    "releaseCount": 1,
-    "completedRoundTrips": 1
-  }
+    "awakenCount": 101,
+    "releaseCount": 101,
+    "completedRoundTrips": 101
+  },
+  "recentSignatures": [
+    {
+      "action": "RELEASE",
+      "signature": "3aDzw3NQmTPm7WEAv51BStyH6iaidpu5QvWgbQPvUxFhZzPBQfRS6D2iBPRcBJyxhcfWqVv42jdPESxm2i4wuS2f",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "AWAKEN",
+      "signature": "4jahu2wDyLt3jBeGPiFpVryHbkGXZ2sP2dLKixv88H26mHw3qgtqX8cfoiSNoRGaHdrWNu3z14aVo43zNfVV4sB4",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "RELEASE",
+      "signature": "dbiH2UY3MyH1GEswt8eSH3kLjt7BqdLCwgVKSE3pLd7ssSaZ3HyqTmXAkKrLrbuXmq5VqXsizPCjQqwCDUrZbNG",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "AWAKEN",
+      "signature": "2EQcE6egXrPvNc8Ln44o6qURExWNMbhugPp87GNFSNoTk6FubbC2AZNtGyrs8tbRrsgV6ZbUJPQiQFczAY3cUcKS",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "RELEASE",
+      "signature": "4Mu78EzbrNCYuqwds7g5g49R4jdjHSg1wuvv2NYqvrpNFMWcVxjWHmjSwjNGHJAf3e32A75QwmdD1c4e4ULWLo8F",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "AWAKEN",
+      "signature": "FrNStG7omvbSwRcX847y5mftunTcDM48arkVNmp1HTKKv5Sa2TqV5jhJZzr33rZehHS92u5b9mpYbsPNNuqmnW6",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "FUND_ESCROW_ASSET",
+      "signature": "H4vqTYN4yHqC8Z5FKdsMHg6tMFGH8ePm7Ze4c55uaBGY7GgXZAaA8pCDY5onNZtQYXKnjAvY29c3ssHPnFVC92u",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "INIT_RECIPE",
+      "signature": "xQkg21F8wQLFqnyQTyVNM8VQy3wi6JaMtDDbFzdMDU2rp5MwcuRKJ9Za5HNJAe4JU6tuq7Yo3W6tifqmbpVpufc",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "INIT_ESCROW",
+      "signature": "3gM6svnx6XW4AkmF35wBzjaZ4DD1JLZZe2pmLHvrSkeCDyiLGKQ7sjxd2VBGZVgAHFkZhLhdEjZUcmMryrznKN82",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "CREATE_ASSET",
+      "signature": "64NGkXqVeUL8i8LG779Mj45f587xQM9YA5WAJVVRwkht76r6gUZj29b8dyLmHzPSDtLsqqRtiVFgpLFF3TufYdfd",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    },
+    {
+      "action": "CREATE_COLLECTION",
+      "signature": "5eiTsWaQ5NCJudkVUbVmaxpG4hVTJMeKUawEcRUuhZi2BY5t28zuJvNUXAauytD1d4nyMaDasf36NPJFEWqqq3xA",
+      "recordedAt": null,
+      "confirmationState": "CONFIRMED"
+    }
+  ]
 }
