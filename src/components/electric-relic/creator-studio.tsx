@@ -34,6 +34,7 @@ import {
 import { FormEvent, useEffect, useMemo, useState } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
+import { getIdentityToken } from "@privy-io/react-auth"
 import {
   electricRelicAssets,
   electricRelicProtocol,
@@ -1219,10 +1220,18 @@ export default function CreatorStudio() {
         },
       }
 
+      const identityToken = await getIdentityToken()
+      if (!identityToken) {
+        setSubmitState("failed")
+        setSubmitMessage("Your X access session expired. Re-enter the founding gate and try again.")
+        return
+      }
+
       const response = await fetch(applicationEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "privy-id-token": identityToken,
         },
         body: JSON.stringify(submission),
       })

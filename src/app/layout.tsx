@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import "@solana/wallet-adapter-react-ui/styles.css"
 import "./globals.css"
 import ElectricRelicWalletProvider from "@/components/electric-relic/wallet-provider"
+import RelicIdentityProvider from "@/components/electric-relic/identity-provider"
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://electric-relic.vercel.app"
@@ -44,7 +45,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ElectricRelicWalletProvider>{children}</ElectricRelicWalletProvider>
+        <RelicIdentityProvider>
+          <ElectricRelicWalletProvider>{children}</ElectricRelicWalletProvider>
+        </RelicIdentityProvider>
       </body>
     </html>
   )

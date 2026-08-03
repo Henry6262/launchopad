@@ -10,6 +10,8 @@ const nextConfig = {
           "base-uri 'self'",
           "object-src 'none'",
           "frame-ancestors 'none'",
+          "frame-src 'self' https://auth.privy.io",
+          "child-src 'self' https://auth.privy.io",
           "form-action 'self'",
           `script-src 'self' 'unsafe-inline'${
             process.env.NODE_ENV === "development"

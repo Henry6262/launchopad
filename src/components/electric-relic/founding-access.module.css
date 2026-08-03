@@ -1,0 +1,37 @@
+.gatePage { --lime:#b7ff32; position:relative; display:grid; min-height:100svh; place-items:center; overflow:hidden; padding:90px 20px 30px; background:radial-gradient(circle at 50% 40%,rgba(183,255,50,.08),transparent 30%),#030504; color:#f4f5ec; font-family:"Mona Sans",Arial,sans-serif; }
+.gateStars { position:absolute; inset:0; opacity:.45; background-image:radial-gradient(circle at 20% 20%,white 0 1px,transparent 1.4px),radial-gradient(circle at 72% 62%,#b7ff32 0 1px,transparent 1.4px); background-size:170px 140px,230px 190px; mask-image:radial-gradient(circle,black,transparent 76%); }
+.gateBrand { position:absolute; z-index:2; top:24px; left:28px; }
+.gateBrand > span { display:flex; align-items:center; gap:9px; }
+.gateBrand svg { width:34px; stroke:var(--lime); }
+.gateBrand span span { color:white; font-family:"Rebond",sans-serif; font-weight:900; }
+.gateBrand span span b { color:var(--lime); }
+.gatePanel { position:relative; z-index:1; display:grid; width:min(620px,100%); justify-items:center; gap:26px; padding:clamp(28px,5vw,56px); border:1px solid rgba(244,245,236,.14); border-radius:36px; background:rgba(7,11,8,.82); box-shadow:0 40px 110px rgba(0,0,0,.52),inset 0 1px rgba(255,255,255,.05); backdrop-filter:blur(24px); }
+.orbitGlyph { position:relative; display:grid; width:132px; aspect-ratio:1; place-items:center; border:1px solid rgba(183,255,50,.25); border-radius:50%; box-shadow:0 0 46px rgba(183,255,50,.12); }
+.orbitGlyph::before,.orbitGlyph::after { position:absolute; border:1px solid rgba(183,255,50,.14); border-radius:50%; content:""; }
+.orbitGlyph::before { inset:-15px 8px; transform:rotate(28deg); }
+.orbitGlyph::after { inset:8px -15px; transform:rotate(-28deg); }
+.orbitGlyph i,.orbitGlyph b { position:absolute; width:7px; aspect-ratio:1; border-radius:50%; background:#b7ff32; box-shadow:0 0 12px #b7ff32; animation:gateOrbit 5s linear infinite; }
+.orbitGlyph b { width:10px; animation-duration:8s; animation-direction:reverse; }
+.orbitGlyph span { color:white; font-family:"Rebond",sans-serif; font-size:38px; font-weight:900; letter-spacing:-.08em; }
+.accessContent { display:grid; width:100%; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:15px; }
+.accessIcon { display:grid; width:42px; aspect-ratio:1; place-items:center; border:1px solid rgba(183,255,50,.22); border-radius:14px; background:rgba(183,255,50,.06); color:#b7ff32; }
+.accessIcon svg { width:18px; }
+.accessCopy { display:grid; gap:3px; min-width:0; }
+.accessCopy small { color:#b7ff32; font-family:monospace; font-size:6px; font-weight:900; letter-spacing:.12em; }
+.accessCopy strong { color:white; font-family:"Rebond",sans-serif; font-size:17px; font-weight:900; letter-spacing:-.035em; }
+.accessCopy span { color:rgba(244,245,236,.43); font-size:10px; line-height:1.4; }
+.accessActions a,.accessActions button { display:flex; min-height:42px; align-items:center; justify-content:center; gap:8px; padding:0 14px; border:0; border-radius:13px; background:#b7ff32; color:#071002; font-family:monospace; font-size:7px; font-weight:900; letter-spacing:.08em; cursor:pointer; white-space:nowrap; }
+.accessActions button:disabled { background:rgba(244,245,236,.08); color:rgba(244,245,236,.3); cursor:not-allowed; }
+.accessId { display:grid; width:100%; gap:6px; padding:11px 13px; border:1px solid rgba(244,245,236,.1); border-radius:13px; background:rgba(0,0,0,.18); }
+.accessId small { color:rgba(244,245,236,.3); font-family:monospace; font-size:6px; font-weight:900; letter-spacing:.12em; }
+.accessId code { overflow:hidden; color:rgba(244,245,236,.6); font-size:8px; text-overflow:ellipsis; white-space:nowrap; }
+.backLink { display:flex; align-items:center; gap:7px; color:rgba(244,245,236,.36); font-family:monospace; font-size:7px; font-weight:900; letter-spacing:.1em; }
+.dock { width:100%; max-width:650px; margin-top:24px; padding:10px; border:1px solid rgba(244,245,236,.13); border-radius:19px; background:rgba(5,8,6,.72); box-shadow:0 18px 45px rgba(0,0,0,.25); backdrop-filter:blur(18px); }
+.dock .accessIcon { width:38px; border-radius:12px; }
+.dock .accessCopy strong { font-size:14px; }
+.dock .accessCopy span { font-size:9px; }
+.spin { animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes gateOrbit { from { transform:rotate(0deg) translateX(66px) rotate(0deg); } to { transform:rotate(360deg) translateX(66px) rotate(-360deg); } }
+@media (max-width:620px) { .accessContent { grid-template-columns:auto 1fr; } .accessActions { grid-column:1/-1; } .accessActions a,.accessActions button { width:100%; } .dock { margin-top:18px; } .gatePanel { border-radius:27px; } }
+@media (prefers-reduced-motion:reduce) { .orbitGlyph i,.orbitGlyph b,.spin { animation:none; } }

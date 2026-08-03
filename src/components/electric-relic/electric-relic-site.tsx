@@ -29,6 +29,7 @@ import {
 } from "framer-motion"
 import { useMemo, useRef, useState, type ReactNode } from "react"
 import ProductMark from "@/components/electric-relic/product-mark"
+import FoundingAccess from "@/components/electric-relic/founding-access"
 import ScrollStack from "@/components/react-bits/scroll-stack"
 import SpotlightCard from "@/components/react-bits/spotlight-card"
 import styles from "./electric-relic-landing.module.css"
@@ -214,8 +215,7 @@ function HeroWorld() {
   return (
     <div className={styles.heroWorld}>
       <div className={styles.heroWorldTopline}>
-        <span><i /> WORLD ENGINE ONLINE</span>
-        <b>30 LIVE FORMS</b>
+        <span><i /> SOL ROUTE ONLINE</span>
       </div>
       <RelicDomeGallery images={domeImages} />
     </div>
@@ -256,17 +256,18 @@ function Hero() {
           animate={{ opacity: 1 }}
           transition={{ duration: reduceMotion ? 0 : 0.48, ease: [0.22, 1, 0.36, 1] }}
         >
-          <span className={styles.eyebrow}><i /> RELIC.FUN // HOME OF 212</span>
+          <span className={styles.eyebrow}><i /> RELIC.FUN // PRIVATE ORBIT</span>
           <h1>ONE TOKEN.<br /><span>TWO FORMS.</span></h1>
-          <p>TOKEN ⇄ NFT. THAT&apos;S THE 212 STANDARD.</p>
+          <p>LOCK THE TOKEN. AWAKEN THE NFT. REVERSE IT ANYTIME.</p>
           <div className={styles.heroActions}>
             <Link className={styles.primaryButton} href="/create">
-              LAUNCH ON 212 <ArrowUpRight size={18} />
+              ENTER PRIVATE ORBIT <ArrowUpRight size={18} />
             </Link>
-            <a className={styles.secondaryButton} href="#standard">
-              SEE THE LOOP <ArrowRight size={18} />
+            <a className={styles.secondaryButton} href="#worlds">
+              FOLLOW THE MAP <ArrowRight size={18} />
             </a>
           </div>
+          <FoundingAccess variant="dock" />
         </motion.div>
 
         <motion.div

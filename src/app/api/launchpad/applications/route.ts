@@ -15,6 +15,7 @@ import {
   consumePublicApiRateLimit,
   getCreatorApplicationRateLimitPolicy,
 } from "@/lib/electric-relic/request-guard.server"
+import { verifyFoundingAccess } from "@/lib/electric-relic/founding-access.server"
 
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
@@ -40,6 +41,25 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const access = await verifyFoundingAccess(request)
+  if (!access.ok || !access.allowed) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          code: access.ok ? "NOT_ALLOWLISTED" : access.code,
+          message: access.ok
+            ? "This X identity is not on the founding-flight allowlist"
+            : access.message,
+        },
+      },
+      {
+        status: access.ok ? 403 : access.status,
+        headers: { "Cache-Control": "no-store" },
+      }
+    )
+  }
+
   const rateLimit = consumePublicApiRateLimit(
     request,
     getCreatorApplicationRateLimitPolicy()

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import CreatorStudio from "@/components/electric-relic/creator-studio"
+import FoundingAccess from "@/components/electric-relic/founding-access"
 
 export const metadata: Metadata = {
   title: "Launch on 212 — RELIC.FUN",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function ElectricRelicCreatePage() {
-  return <CreatorStudio />
+  return <FoundingAccess><CreatorStudio /></FoundingAccess>
 }
