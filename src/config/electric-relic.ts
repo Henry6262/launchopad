@@ -1,10 +1,10 @@
 export const electricRelicBrand = {
-  name: "ELECTRIC RELIC",
-  shortName: "ER",
+  name: "RELIC.FUN",
+  shortName: "RELIC",
   world: "THE HOLLOW",
   tagline: "Check the coin. Model the backing. Build the World.",
   description:
-    "Launch and trade a coin on Pump, then connect the same verified classic SPL mint to a reversible Metaplex Core NFT World.",
+    "Connect a verified classic SPL token to a reversible Metaplex Core NFT World through the 212 Standard.",
 } as const
 
 export const electricRelicPump = {

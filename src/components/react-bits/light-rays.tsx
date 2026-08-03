@@ -201,10 +201,17 @@ export default function LightRays({
     const node = containerRef.current
     if (!node || !visible || staticMode) return
 
-    const renderer = new Renderer({
-      dpr: Math.min(window.devicePixelRatio, 1.5),
-      alpha: true,
-    })
+    let renderer: Renderer
+    try {
+      renderer = new Renderer({
+        dpr: Math.min(window.devicePixelRatio, 1.5),
+        alpha: true,
+      })
+    } catch {
+      node.replaceChildren()
+      setStaticMode(true)
+      return
+    }
     const gl = renderer.gl
     gl.canvas.style.width = "100%"
     gl.canvas.style.height = "100%"

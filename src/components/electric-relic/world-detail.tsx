@@ -194,7 +194,7 @@ export default function WorldDetail({
         <div className={styles.heroCopy}>
           <Link className={styles.backLink} href="/">
             <ArrowLeft size={15} />
-            ELECTRIC RELIC
+            RELIC.FUN
           </Link>
 
           <div className={styles.statusRow}>

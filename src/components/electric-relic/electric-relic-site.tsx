@@ -1,111 +1,136 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import Image from "next/image"
 import Link from "next/link"
 import {
   ArrowRight,
   ArrowUpRight,
+  Box,
   Check,
-  ChevronRight,
-  ExternalLink,
+  Coins,
+  Gift,
+  Layers3,
   Menu,
   Repeat2,
   ShieldCheck,
+  Sparkles,
+  Wallet,
   X,
   Zap,
 } from "lucide-react"
-import { useState } from "react"
-import LightRays from "@/components/react-bits/light-rays"
-import SpotlightCard from "@/components/react-bits/spotlight-card"
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion"
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 import ProductMark from "@/components/electric-relic/product-mark"
+import SpotlightCard from "@/components/react-bits/spotlight-card"
 import styles from "./electric-relic-landing.module.css"
 
-type LoopMode = "awaken" | "release" | "evolve"
+const LightRays = dynamic(() => import("@/components/react-bits/light-rays"), {
+  ssr: false,
+})
 
-type LoopDefinition = {
-  id: LoopMode
-  literal: string
-  name: string
-  send: string
-  receive: string
-  sendType: "coin" | "nft"
-  receiveType: "coin" | "nft"
-  sendImage?: string
-  receiveImage?: string
+const CenterFlow = dynamic(() => import("@/components/react-bits/center-flow"), {
+  ssr: false,
+})
+
+type StandardMode = "awaken" | "release" | "evolve"
+type AssetKind = "token" | "nft"
+
+type StandardMove = {
+  id: StandardMode
+  index: string
+  title: string
+  equation: string
+  input: string
+  output: string
+  inputKind: AssetKind
+  outputKind: AssetKind
+  inputImage?: string
+  outputImage?: string
   fee: string
   approvals: string
-  middle: string
-  description: string
+  line: string
 }
 
-const loopModes: LoopDefinition[] = [
+const standardMoves: StandardMove[] = [
   {
     id: "awaken",
-    literal: "TOKEN → NFT",
-    name: "AWAKEN",
-    send: "X $TOKEN",
-    receive: "1 CORE NFT",
-    sendType: "coin",
-    receiveType: "nft",
-    receiveImage: "/images/electric-relic/relics/relic-02.webp",
+    index: "01",
+    title: "AWAKEN",
+    equation: "X TOKEN → 1 NFT",
+    input: "X $TOKEN",
+    output: "1 CORE NFT",
+    inputKind: "token",
+    outputKind: "nft",
+    outputImage: "/images/electric-relic/relics/relic-02.webp",
     fee: "0.005 SOL",
-    approvals: "1 WALLET APPROVAL",
-    middle: "TOKENS ENTER THE WORLD VAULT",
-    description: "A pre-minted form leaves escrow and arrives in your wallet.",
+    approvals: "1 SIGNATURE",
+    line: "Lock tokens. Receive one form.",
   },
   {
     id: "release",
-    literal: "NFT → TOKEN",
-    name: "RELEASE",
-    send: "1 CORE NFT",
-    receive: "X $TOKEN",
-    sendType: "nft",
-    receiveType: "coin",
-    sendImage: "/images/electric-relic/relics/relic-06.webp",
+    index: "02",
+    title: "RELEASE",
+    equation: "1 NFT → X TOKEN",
+    input: "1 CORE NFT",
+    output: "X $TOKEN",
+    inputKind: "nft",
+    outputKind: "token",
+    inputImage: "/images/electric-relic/relics/relic-06.webp",
     fee: "0.005 SOL",
-    approvals: "1 WALLET APPROVAL",
-    middle: "THE FORM RETURNS TO THE VAULT",
-    description: "Your configured token backing returns to your wallet.",
+    approvals: "1 SIGNATURE",
+    line: "Return the form. Recover its backing.",
   },
   {
     id: "evolve",
-    literal: "2 SWAPS",
-    name: "EVOLVE",
-    send: "1 CORE NFT",
-    receive: "ANOTHER FORM",
-    sendType: "nft",
-    receiveType: "nft",
-    sendImage: "/images/electric-relic/relics/relic-04.webp",
-    receiveImage: "/images/electric-relic/relics/relic-08.webp",
+    index: "03",
+    title: "EVOLVE",
+    equation: "NFT → TOKEN → NFT",
+    input: "1 CORE NFT",
+    output: "ANOTHER FORM",
+    inputKind: "nft",
+    outputKind: "nft",
+    inputImage: "/images/electric-relic/relics/relic-04.webp",
+    outputImage: "/images/electric-relic/relics/relic-08.webp",
     fee: "≥ 0.010 SOL",
-    approvals: "2 WALLET APPROVALS",
-    middle: "RELEASE, THEN AWAKEN AGAIN",
-    description: "A different eligible form is possible. It is never guaranteed.",
+    approvals: "2 SIGNATURES",
+    line: "Release, then Awaken again. No rarity promise.",
   },
 ]
 
-const relics = Array.from(
-  { length: 9 },
-  (_, index) => `/images/electric-relic/relics/relic-${String(index + 1).padStart(2, "0")}.webp`
-)
+function XBrandIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.657l-5.214-6.817-5.967 6.817H1.68l7.73-8.835L1.254 2.25h6.826l4.713 6.231 5.451-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"
+      />
+    </svg>
+  )
+}
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const closeMenu = () => setMenuOpen(false)
-
   return (
     <header className={styles.header}>
       <div className={styles.headerInner}>
-        <a className={styles.brandLink} href="#top" aria-label="Electric Relic home">
+        <a className={styles.brandLink} href="#top" aria-label="Relic home">
           <ProductMark className={styles.brand} />
-          <span className={styles.protocolTag}>POWERED BY 212 PROTOCOL</span>
+          <span className={styles.protocolTag}>THE 212 STANDARD</span>
         </a>
 
         <nav className={styles.desktopNav} aria-label="Primary navigation">
-          <a href="#loop">THE LOOP</a>
+          <a href="#standard">212 STANDARD</a>
+          <a href="#rewards">REWARDS</a>
           <a href="#worlds">WORLDS</a>
-          <a href="#creators">FOR CREATORS</a>
         </nav>
 
         <div className={styles.headerActions}>
@@ -113,8 +138,7 @@ function Header() {
             CHECK TOKEN
           </Link>
           <Link className={styles.headerLaunch} href="/create">
-            LAUNCH A WORLD
-            <ArrowUpRight size={15} />
+            LAUNCH ON 212 <ArrowUpRight size={15} />
           </Link>
           <button
             className={styles.menuButton}
@@ -129,16 +153,16 @@ function Header() {
 
         {menuOpen && (
           <nav className={styles.mobileNav} aria-label="Mobile navigation">
-            <a href="#loop" onClick={closeMenu}>
-              THE LOOP <ArrowRight size={16} />
-            </a>
-            <a href="#worlds" onClick={closeMenu}>
-              WORLDS <ArrowRight size={16} />
-            </a>
-            <a href="#creators" onClick={closeMenu}>
-              FOR CREATORS <ArrowRight size={16} />
-            </a>
-            <Link href="/pump" onClick={closeMenu}>
+            {[
+              ["#standard", "212 STANDARD"],
+              ["#rewards", "REWARDS"],
+              ["#worlds", "WORLDS"],
+            ].map(([href, label]) => (
+              <a key={href} href={href} onClick={() => setMenuOpen(false)}>
+                {label} <ArrowRight size={16} />
+              </a>
+            ))}
+            <Link href="/pump" onClick={() => setMenuOpen(false)}>
               CHECK TOKEN <ArrowRight size={16} />
             </Link>
           </nav>
@@ -148,230 +172,428 @@ function Header() {
   )
 }
 
-function Hero() {
-  return (
-    <section className={styles.hero} id="top">
-      <div className={styles.heroArt} aria-hidden="true">
-        <Image
-          src="/images/electric-relic/hero-212-engine-v1.webp"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-        />
-      </div>
-      <div className={styles.heroShade} aria-hidden="true" />
-      <LightRays
-        className={styles.heroRays}
-        raysOrigin="right"
-        raysColor="#b7ff32"
-        raysSpeed={0.24}
-        lightSpread={0.55}
-        rayLength={1.35}
-        followMouse={false}
-        distortion={0.018}
-      />
-
-      <div className={styles.heroShell}>
-        <div className={styles.heroCopy}>
-          <span className={styles.eyebrow}>
-            <i /> THE 404 LAUNCHPAD FOR PUMP COMMUNITIES
-          </span>
-          <h1>
-            NFTS
-            <span>WITH AN EXIT.</span>
-          </h1>
-          <p>
-            Lock a fixed amount of a compatible Pump token to awaken an NFT.
-            Release it to recover its configured token backing.
-          </p>
-          <div className={styles.heroActions}>
-            <a className={styles.primaryButton} href="#loop">
-              WATCH THE LOOP
-              <ArrowRight size={18} />
-            </a>
-            <Link className={styles.secondaryButton} href="/create">
-              LAUNCH A WORLD
-              <ArrowUpRight size={18} />
-            </Link>
-          </div>
-          <span className={styles.eligibilityNote}>
-            CLASSIC SPL V1 <b>·</b> TOKEN-2022 SUPPORT IN DEVELOPMENT
-          </span>
-        </div>
-
-        <div className={styles.heroEquation} aria-label="Configured backing equation">
-          <span>THE 212 ENGINE</span>
-          <div>
-            <b>X $TOKEN</b>
-            <i>⇄</i>
-            <b>1 CORE NFT</b>
-          </div>
-          <small>AWAKEN → &nbsp;&nbsp;·&nbsp;&nbsp; ← RELEASE</small>
-        </div>
-      </div>
-
-      <div className={styles.proofRail}>
-        <span><Check size={13} /> 101 DEVNET LOOPS</span>
-        <span><ShieldCheck size={13} /> NON-CUSTODIAL</span>
-        <span><Repeat2 size={13} /> REVERSIBLE</span>
-        <Link href="/world/devnet-canary">
-          VIEW PUBLIC PROOF <ArrowUpRight size={13} />
-        </Link>
-      </div>
-    </section>
-  )
-}
-
-function FlowAsset({
-  type,
+function AssetNode({
+  kind,
   label,
   image,
+  compact = false,
 }: {
-  type: "coin" | "nft"
+  kind: AssetKind
   label: string
   image?: string
+  compact?: boolean
 }) {
   return (
-    <div className={styles.flowAsset}>
-      <span className={styles.flowAssetLabel}>{label}</span>
-      {type === "coin" ? (
-        <span className={styles.coinAsset} aria-hidden="true">
-          <Zap size={30} />
+    <div className={`${styles.assetNode} ${compact ? styles.assetNodeCompact : ""}`}>
+      <span className={styles.assetLabel}>{label}</span>
+      {kind === "token" ? (
+        <span className={styles.tokenGlyph} aria-hidden="true">
+          <Zap size={compact ? 22 : 32} />
         </span>
       ) : (
-        <span className={styles.nftAsset} aria-hidden="true">
-          {image && <Image src={image} alt="" fill sizes="180px" />}
+        <span className={styles.nftGlyph} aria-hidden="true">
+          {image ? <Image src={image} alt="" fill sizes={compact ? "110px" : "180px"} /> : <Box />}
         </span>
       )}
     </div>
   )
 }
 
-function Loop() {
-  const [activeId, setActiveId] = useState<LoopMode>("awaken")
-  const active = loopModes.find((mode) => mode.id === activeId) ?? loopModes[0]
+function HeroMachine() {
+  const [mode, setMode] = useState<StandardMode>("awaken")
+  const [run, setRun] = useState(0)
+  const active = standardMoves.find((move) => move.id === mode) ?? standardMoves[0]
+
+  const replay = (next: StandardMode) => {
+    setMode(next)
+    setRun((value) => value + 1)
+  }
 
   return (
-    <section className={styles.loopSection} id="loop">
-      <div className={styles.shell}>
-        <div className={styles.sectionHeading}>
-          <div>
-            <span className={styles.eyebrow}>THE 212 LOOP</span>
-            <h2>ONE VAULT. THREE MOVES.</h2>
-          </div>
-          <p>Nothing hides behind lore. Choose a move and see exactly what changes hands.</p>
+    <div className={styles.heroMachineWrap}>
+      <div className={styles.machineTopline}>
+        <span><i /> 212 ENGINE</span>
+        <b>{active.title}</b>
+      </div>
+
+      <div
+        className={`${styles.heroMachine} ${styles[mode]}`}
+        aria-label={`${active.title}: ${active.equation}`}
+      >
+        <AssetNode kind={active.inputKind} label={active.input} image={active.inputImage} />
+
+        <div className={styles.machineLane} aria-hidden="true">
+          <span />
+          <i key={`left-${run}`} />
         </div>
 
-        <div className={styles.loopTabs} role="group" aria-label="Choose a protocol action">
-          {loopModes.map((mode) => (
+        <div className={styles.machineCore} aria-hidden="true">
+          <span className={styles.coreRingOne} />
+          <span className={styles.coreRingTwo} />
+          <i key={`core-${run}`} />
+          <b>212</b>
+          <small>STANDARD</small>
+        </div>
+
+        <div className={styles.machineLane} aria-hidden="true">
+          <span />
+          <i key={`right-${run}`} />
+        </div>
+
+        <AssetNode kind={active.outputKind} label={active.output} image={active.outputImage} />
+      </div>
+
+      <div className={styles.machineControls} role="group" aria-label="Preview a 212 action">
+        {standardMoves.map((move) => (
+          <button
+            key={move.id}
+            type="button"
+            aria-pressed={mode === move.id}
+            onClick={() => replay(move.id)}
+          >
+            <span>{move.index}</span>{move.title}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function Hero() {
+  const heroRef = useRef<HTMLElement>(null)
+  const reduceMotion = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  })
+  const machineY = useTransform(scrollYProgress, [0, 1], [0, -16])
+  const machineScale = useTransform(scrollYProgress, [0, 1], [1, 1.035])
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, -10])
+
+  return (
+    <section className={styles.hero} id="top" ref={heroRef}>
+      <div className={styles.heroGrid} aria-hidden="true" />
+      {!reduceMotion && (
+        <LightRays
+          className={styles.heroRays}
+          raysOrigin="top-right"
+          raysColor="#b7ff32"
+          raysSpeed={0.18}
+          lightSpread={0.62}
+          rayLength={1.18}
+          followMouse={false}
+          distortion={0.012}
+        />
+      )}
+
+      <div className={styles.heroShell}>
+        <motion.div className={styles.heroCopy} style={reduceMotion ? undefined : { y: copyY }}>
+          <span className={styles.eyebrow}><i /> RELIC.FUN // HOME OF 212</span>
+          <h1>ONE TOKEN.<br /><span>TWO FORMS.</span></h1>
+          <p>TOKEN ⇄ NFT. THAT&apos;S THE 212 STANDARD.</p>
+          <div className={styles.heroActions}>
+            <Link className={styles.primaryButton} href="/create">
+              LAUNCH ON 212 <ArrowUpRight size={18} />
+            </Link>
+            <a className={styles.secondaryButton} href="#standard">
+              SEE THE LOOP <ArrowRight size={18} />
+            </a>
+          </div>
+          <span className={styles.eligibilityNote}>CLASSIC SPL V1 · TOKEN-2022 IN DEVELOPMENT</span>
+        </motion.div>
+
+        <motion.div
+          className={styles.heroMachineColumn}
+          style={reduceMotion ? undefined : { y: machineY, scale: machineScale }}
+        >
+          <HeroMachine />
+        </motion.div>
+      </div>
+
+      <div className={styles.heroRail}>
+        <span><Check size={13} /> 101 DEVNET LOOPS</span>
+        <span><ShieldCheck size={13} /> WALLET SIGNED</span>
+        <span><Repeat2 size={13} /> REVERSIBLE</span>
+        <b>WELCOME TO THE REAL WORLD.</b>
+      </div>
+    </section>
+  )
+}
+
+function StandardStage({ move }: { move: StandardMove }) {
+  const reduceMotion = useReducedMotion()
+
+  return (
+    <div className={styles.standardStage} aria-live="polite">
+      <div className={styles.stageTopline}>
+        <span>212 / {move.index}</span>
+        <b>{move.title}</b>
+      </div>
+
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={move.id}
+          className={`${styles.stageSequence} ${styles[move.id]}`}
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={reduceMotion ? undefined : { opacity: 0, scale: 1.01 }}
+          transition={{ duration: reduceMotion ? 0 : 0.34, ease: "easeOut" }}
+        >
+          <AssetNode compact kind={move.inputKind} label={move.input} image={move.inputImage} />
+          <div className={styles.stageRail} aria-hidden="true"><i /><span /></div>
+          <div className={styles.stageCore} aria-hidden="true"><b>212</b><i /></div>
+          <div className={styles.stageRail} aria-hidden="true"><i /><span /></div>
+          <AssetNode compact kind={move.outputKind} label={move.output} image={move.outputImage} />
+        </motion.div>
+      </AnimatePresence>
+
+      <div className={styles.stageReceipt}>
+        <strong>{move.line}</strong>
+        <span>{move.fee}</span>
+        <span>{move.approvals}</span>
+      </div>
+    </div>
+  )
+}
+
+function Standard() {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const stepRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const reduceMotion = useReducedMotion()
+
+  useEffect(() => {
+    const steps = stepRefs.current.filter((step): step is HTMLButtonElement => Boolean(step))
+    if (!steps.length || !("IntersectionObserver" in window)) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const current = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (current) setActiveIndex(Number((current.target as HTMLElement).dataset.standardStep ?? 0))
+      },
+      { rootMargin: "-30% 0px -48%", threshold: [0.2, 0.45, 0.7] },
+    )
+
+    steps.forEach((step) => observer.observe(step))
+    return () => observer.disconnect()
+  }, [])
+
+  const selectStep = (index: number) => {
+    setActiveIndex(index)
+    stepRefs.current[index]?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "center",
+    })
+  }
+
+  return (
+    <section className={styles.standardSection} id="standard">
+      <div className={styles.sectionIntro}>
+        <span className={styles.eyebrow}>THE 212 STANDARD</span>
+        <h2>TOKEN. NFT.<br /><span>BACK AGAIN.</span></h2>
+        <p>One vault. Three moves.</p>
+      </div>
+
+      <div className={styles.standardLayout}>
+        <div className={styles.standardSticky}>
+          <StandardStage move={standardMoves[activeIndex]} />
+          <div className={styles.standardTabs} role="tablist" aria-label="212 actions">
+            {standardMoves.map((move, index) => (
+              <button
+                key={move.id}
+                type="button"
+                role="tab"
+                aria-selected={activeIndex === index}
+                onClick={() => selectStep(index)}
+              >
+                {move.index} / {move.title}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.standardSteps}>
+          {standardMoves.map((move, index) => (
             <button
+              key={move.id}
+              ref={(node) => { stepRefs.current[index] = node }}
               type="button"
-              key={mode.id}
-              className={activeId === mode.id ? styles.activeTab : ""}
-              aria-pressed={activeId === mode.id}
-              onClick={() => setActiveId(mode.id)}
+              data-standard-step={index}
+              className={activeIndex === index ? styles.activeStandardStep : ""}
+              onClick={() => selectStep(index)}
             >
-              <small>{mode.literal}</small>
-              <strong>{mode.name}</strong>
+              <span>{move.index}</span>
+              <div><small>{move.equation}</small><strong>{move.title}</strong><p>{move.line}</p></div>
+              <ArrowRight size={20} />
             </button>
           ))}
         </div>
+      </div>
 
-        <div className={styles.loopReceipt} aria-live="polite">
-          <div className={styles.receiptTopline}>
-            <span>TRANSACTION PREVIEW</span>
-            <b>WALLET SIGNS EVERY STEP</b>
+      <div className={styles.standardFoot}>
+        <span><ShieldCheck size={14} /> MPL-HYBRID V1</span>
+        <span><Wallet size={14} /> EVERY MOVE IS SIGNED</span>
+        <span>NO BURN · NO GUARANTEED RARITY</span>
+      </div>
+    </section>
+  )
+}
+
+const rewardTasks = [
+  { id: "follow", icon: <XBrandIcon />, label: "FOLLOW A WORLD", type: "X API", reward: "+1 SHARD" },
+  { id: "repost", icon: <Repeat2 size={17} />, label: "REPOST THE DROP", type: "X API", reward: "+1 SHARD" },
+  { id: "awaken", icon: <Zap size={17} />, label: "AWAKEN A FORM", type: "ONCHAIN", reward: "+2 SHARDS" },
+]
+
+function StaticPool() {
+  return (
+    <div className={styles.staticPool} aria-hidden="true">
+      {["A", "B", "C", "X", "NFT", "SOL"].map((label) => <span key={label}>{label}</span>)}
+      <div><b>212</b><small>POOL</small></div>
+    </div>
+  )
+}
+
+function Rewards() {
+  const [activeTask, setActiveTask] = useState(0)
+  const [dropOpen, setDropOpen] = useState(false)
+  const flowRef = useRef<HTMLDivElement>(null)
+  const flowInView = useInView(flowRef, { margin: "-18% 0px -18% 0px" })
+  const reduceMotion = useReducedMotion()
+
+  const poolNodes = useMemo(
+    () => [
+      { content: <span className={styles.poolNode}>$A</span> },
+      { content: <span className={styles.poolNode}><XBrandIcon /></span> },
+      { content: <span className={styles.poolNode}>$B</span> },
+      { content: <span className={styles.poolNode}><Gift size={18} /></span> },
+      { content: <span className={styles.poolNode}>$C</span> },
+      { content: <span className={styles.poolNode}><Layers3 size={18} /></span> },
+    ],
+    [],
+  )
+
+  return (
+    <section className={styles.rewardsSection} id="rewards">
+      <div className={styles.rewardsIntro}>
+        <span className={styles.eyebrow}>THE 212 NETWORK</span>
+        <h2>WORLDS PAY<br /><span>TOGETHER.</span></h2>
+        <p>DO → VERIFY → OPEN.</p>
+      </div>
+
+      <div className={styles.rewardsGrid}>
+        <div className={styles.poolPanel} ref={flowRef}>
+          <div className={styles.panelTopline}>
+            <span><i /> SHARED REWARD VAULT</span>
+            <b>CREATOR FUNDED</b>
           </div>
-
-          <div className={`${styles.flowStage} ${styles[active.id]}`}>
-            <FlowAsset
-              type={active.sendType}
-              label={active.send}
-              image={active.sendImage}
-            />
-
-            <div className={styles.flowRail} aria-hidden="true">
-              <span className={styles.railLine} />
-              <span className={styles.railPulse} />
-              {active.id === "evolve" && <span className={styles.railPulseSecond} />}
-              <span className={styles.engineCore}>
-                <i />
-                <b>212</b>
-              </span>
-            </div>
-
-            <FlowAsset
-              type={active.receiveType}
-              label={active.receive}
-              image={active.receiveImage}
-            />
+          <div className={styles.poolCanvas} aria-label="Multiple Worlds funding one shared 212 reward pool">
+            {flowInView && !reduceMotion ? (
+              <CenterFlow
+                nodeItems={poolNodes}
+                centerContent={<div className={styles.poolCenter}><b>212</b><small>POOL</small></div>}
+                centerSize={122}
+                nodeSize={58}
+                pulseDuration={2.8}
+                pulseInterval={3.8}
+                pulseLength={0.32}
+                lineWidth={1}
+                pulseWidth={1.5}
+                lineColor="#22301d"
+                pulseColor="#b7ff32"
+                glowColor="#b7ff32"
+                maxGlowIntensity={14}
+                glowDecay={0.9}
+                borderRadius={34}
+                nodeDistance={0.72}
+              />
+            ) : <StaticPool />}
           </div>
-
-          <div className={styles.receiptSummary}>
-            <div>
-              <small>WHAT HAPPENS</small>
-              <strong>{active.middle}</strong>
-              <p>{active.description}</p>
-            </div>
-            <dl>
-              <div>
-                <dt>PROTOCOL FEE</dt>
-                <dd>{active.fee}</dd>
-              </div>
-              <div>
-                <dt>CONFIRMATION</dt>
-                <dd>{active.approvals}</dd>
-              </div>
-            </dl>
+          <div className={styles.poolEquation}>
+            <span>WORLD A</span><i>+</i><span>WORLD B</span><i>+</i><span>WORLD C</span><b>→ 1 POOL</b>
           </div>
         </div>
 
-        <p className={styles.loopDisclosure}>
-          EVOLVE is a recoverable Release followed by a new Awaken. It does not
-          guarantee rarity, uniqueness, or an upgrade.
-        </p>
+        <div className={styles.questPanel}>
+          <div className={styles.panelTopline}>
+            <span><i /> CAMPAIGN PREVIEW</span>
+            <b>RULES PUBLIC</b>
+          </div>
+
+          <div className={styles.questFlow}>
+            <div className={styles.taskList} role="tablist" aria-label="Reward campaign tasks">
+              {rewardTasks.map((task, index) => (
+                <button
+                  key={task.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTask === index}
+                  onClick={() => setActiveTask(index)}
+                >
+                  <span>{task.icon}</span>
+                  <div><small>{task.type}</small><strong>{task.label}</strong></div>
+                  <b>{task.reward}</b>
+                </button>
+              ))}
+            </div>
+
+            <div className={`${styles.rewardDrop} ${dropOpen ? styles.rewardDropOpen : ""}`}>
+              <div className={styles.dropBox} aria-hidden="true">
+                <span /><i /><b>212</b>
+              </div>
+              <div className={styles.dropCopy}>
+                <small>REWARD DROP</small>
+                <strong>{dropOpen ? "CONTENTS REVEALED" : "3 SHARDS TO OPEN"}</strong>
+                <span>{dropOpen ? "ODDS · CONTENTS · CLAIM RULES" : "NO PURCHASE REQUIRED"}</span>
+              </div>
+              <button type="button" onClick={() => setDropOpen((value) => !value)}>
+                {dropOpen ? "CLOSE" : "PREVIEW DROP"} <Sparkles size={16} />
+              </button>
+            </div>
+
+            <AnimatePresence initial={false}>
+              {dropOpen && (
+                <motion.div
+                  className={styles.dropContents}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                >
+                  <span><Coins size={16} /> PARTNER TOKENS</span>
+                  <span><Box size={16} /> WORLD NFTS</span>
+                  <span><Gift size={16} /> CREATOR PERKS</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <small className={styles.conceptNote}>CONCEPT UI · X OAUTH + ONCHAIN VERIFICATION REQUIRED</small>
+        </div>
       </div>
     </section>
   )
 }
 
 function WorldCard({
-  status,
-  tone,
-  title,
-  copy,
-  equation,
   href,
-  action,
-  children,
+  status,
+  title,
+  equation,
+  visual,
 }: {
-  status: string
-  tone: "tested" | "blueprint" | "founding"
-  title: string
-  copy: string
-  equation: string
   href: string
-  action: string
-  children?: React.ReactNode
+  status: string
+  title: string
+  equation: string
+  visual: ReactNode
 }) {
   return (
-    <SpotlightCard
-      className={`${styles.worldCard} ${styles[tone]}`}
-      spotlightColor="rgba(183, 255, 50, 0.16)"
-    >
+    <SpotlightCard className={styles.worldCard} spotlightColor="rgba(183, 255, 50, 0.12)">
       <Link href={href}>
-        <div className={styles.worldCardTop}>
-          <span><i /> {status}</span>
-          <ArrowUpRight size={18} />
-        </div>
-        {children}
-        <div className={styles.worldCardCopy}>
-          <small>{equation}</small>
-          <h3>{title}</h3>
-          <p>{copy}</p>
-          <b>{action} <ArrowRight size={15} /></b>
-        </div>
+        <div className={styles.worldStatus}><span><i /> {status}</span><ArrowUpRight size={17} /></div>
+        <div className={styles.worldVisual}>{visual}</div>
+        <div className={styles.worldCopy}><small>{equation}</small><strong>{title}</strong></div>
       </Link>
     </SpotlightCard>
   )
@@ -380,202 +602,60 @@ function WorldCard({
 function Worlds() {
   return (
     <section className={styles.worldsSection} id="worlds">
-      <div className={styles.shell}>
-        <div className={styles.sectionHeading}>
-          <div>
-            <span className={styles.eyebrow}>WORLDS WITH RECEIPTS</span>
-            <h2>DON&apos;T TRUST THE PITCH. CHECK THE VAULT.</h2>
-          </div>
-          <p>Every World publishes its mint, collection, backing, fees, authorities, and activity.</p>
-        </div>
+      <div className={styles.worldsIntro}>
+        <span className={styles.eyebrow}>WORLDS ON 212</span>
+        <h2>CHECK THE VAULT.<br /><span>THEN ENTER.</span></h2>
+        <Link href="/create">LAUNCH YOURS <ArrowRight size={17} /></Link>
+      </div>
 
-        <div className={styles.worldGrid}>
-          <WorldCard
-            status="TESTED · DEVNET"
-            tone="tested"
-            title="PROTOCOL CANARY"
-            equation="1 ERTEST ⇄ 1 CORE NFT"
-            copy="A valueless public proof with 101 completed Awaken → Release round trips."
-            href="/world/devnet-canary"
-            action="INSPECT PROOF"
-          >
-            <div className={styles.canaryVisual} aria-hidden="true">
-              <span><Zap size={26} /></span>
-              <i />
-              <b>101</b>
-              <small>ROUND TRIPS</small>
-            </div>
-          </WorldCard>
-
-          <WorldCard
-            status="BLUEPRINT · NOT CONNECTED"
-            tone="blueprint"
-            title="THE HOLLOW"
-            equation="CONFIGURATION PENDING"
-            copy="A flagship art and economy blueprint—not represented as a live deployment."
-            href="/world/the-hollow"
-            action="OPEN BLUEPRINT"
-          >
-            <div className={styles.blueprintVisual} aria-hidden="true">
+      <div className={styles.worldGrid}>
+        <WorldCard
+          href="/world/devnet-canary"
+          status="TESTED · DEVNET"
+          title="PROTOCOL CANARY"
+          equation="1 ERTEST ⇄ 1 NFT"
+          visual={<div className={styles.canaryVisual}><Zap size={25} /><b>101</b><small>LOOPS</small></div>}
+        />
+        <WorldCard
+          href="/world/the-hollow"
+          status="BLUEPRINT"
+          title="THE HOLLOW"
+          equation="CONFIGURATION PENDING"
+          visual={
+            <div className={styles.nftFan}>
               {[1, 2, 3].map((item) => (
-                <span key={item}>
-                  <Image
-                    src={`/images/electric-relic/relics/relic-0${item}.webp`}
-                    alt=""
-                    fill
-                    sizes="180px"
-                  />
-                </span>
+                <span key={item}><Image src={`/images/electric-relic/relics/relic-0${item}.webp`} alt="" fill sizes="170px" /></span>
               ))}
             </div>
-          </WorldCard>
-
-          <WorldCard
-            status="FOUNDING CREATOR SLOT"
-            tone="founding"
-            title="YOUR WORLD"
-            equation="YOUR TOKEN ⇄ YOUR FORMS"
-            copy="Bring an eligible token and finished artwork. We validate and deploy the first cohort."
-            href="/create"
-            action="APPLY TO LAUNCH"
-          >
-            <div className={styles.foundingVisual} aria-hidden="true">
-              <span>+</span>
-              <small>WORLD<br />SLOT</small>
-            </div>
-          </WorldCard>
-        </div>
-
-        <div className={styles.relicCollection}>
-          <div className={styles.relicHeading}>
-            <div>
-              <span className={styles.eyebrow}>212 FOUNDING RELICS · CONCEPT SET</span>
-              <h3>EARNED BY THE PEOPLE WHO PROVE THE MACHINE.</h3>
-            </div>
-            <p>Maker. Shifter. Broker. One membership, no rarity ladder, and no token promise.</p>
-          </div>
-          <div className={styles.relicGrid}>
-            {relics.map((src, index) => (
-              <figure key={src}>
-                <Image
-                  src={src}
-                  alt={`Electric Relic founding concept form ${index + 1}`}
-                  fill
-                  sizes="(max-width: 720px) 42vw, 180px"
-                />
-                <figcaption>FORM {String(index + 1).padStart(3, "0")}</figcaption>
-              </figure>
-            ))}
-          </div>
-          <span className={styles.conceptDisclosure}>CONCEPT ART · NOT MINTED · FINAL TERMS REQUIRE A PUBLISHED LAUNCH MANIFEST</span>
-        </div>
+          }
+        />
+        <WorldCard
+          href="/create"
+          status="FOUNDING SLOT"
+          title="YOUR WORLD"
+          equation="YOUR TOKEN ⇄ YOUR FORMS"
+          visual={<div className={styles.openWorldVisual}><span>+</span><small>OPEN<br />SLOT</small></div>}
+        />
       </div>
-    </section>
-  )
-}
 
-function Creators() {
-  return (
-    <section className={styles.creatorSection} id="creators">
-      <div className={styles.creatorShell}>
+      <div className={styles.creatorBanner}>
         <div className={styles.creatorCopy}>
-          <span className={styles.eyebrow}>FOUNDING CREATOR BETA</span>
-          <h2>DON&apos;T JUST LAUNCH A COIN. LAUNCH ITS WORLD.</h2>
-          <p>
-            Bring the coin. Bring the art. Electric Relic validates the economy,
-            prepares the escrow, and publishes the receipts.
-          </p>
-          <div className={styles.creatorSteps}>
-            {[
-              ["01", "CHECK", "Eligible classic-SPL mint"],
-              ["02", "BUILD", "Finished forms + metadata"],
-              ["03", "PROVE", "Backing, fees + authorities"],
-            ].map(([number, title, copy]) => (
-              <div key={number}>
-                <span>{number}</span>
-                <strong>{title}</strong>
-                <small>{copy}</small>
-              </div>
-            ))}
+          <span className={styles.eyebrow}>CREATOR FORGE</span>
+          <h2>BRING THE COIN.<br /><span>BUILD THE WORLD.</span></h2>
+          <div className={styles.creatorRail}>
+            <span>01 / TOKEN</span><i /><span>02 / FORMS</span><i /><span>03 / POOL</span><i /><span>04 / RECEIPT</span>
           </div>
           <div className={styles.creatorActions}>
-            <Link className={styles.primaryButton} href="/pump">
-              CHECK ELIGIBILITY <ArrowRight size={18} />
-            </Link>
-            <Link className={styles.secondaryButton} href="/create">
-              APPLY FOR BETA <ArrowUpRight size={18} />
-            </Link>
+            <Link className={styles.primaryButton} href="/create">OPEN THE FORGE <ArrowUpRight size={18} /></Link>
+            <Link className={styles.secondaryButton} href="/pump">CHECK TOKEN <ArrowRight size={18} /></Link>
           </div>
-          <span className={styles.creatorDisclosure}>
-            FIRST 5–10 WORLDS ARE ASSISTED · V1 DOES NOT CREATE TOKENS OR GENERATE ART
-          </span>
         </div>
+
         <div className={styles.makerVisual} aria-hidden="true">
-          <span className={styles.makerOrbit} />
-          <Image
-            src="/images/electric-relic/brand/maker-idle.png"
-            alt=""
-            fill
-            sizes="(max-width: 760px) 260px, 420px"
-          />
-          <div>
-            <small>THE MAKER</small>
-            <strong>WORLD CONSTRUCTION</strong>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function SocialPortal() {
-  return (
-    <section className={styles.socialSection}>
-      <div className={styles.socialShell}>
-        <div className={styles.blinkPreview} aria-label="Concept preview of a Solana Blink">
-          <div className={styles.blinkTop}>
-            <span className={styles.miniMark}><Zap size={16} /></span>
-            <div>
-              <strong>ELECTRIC RELIC</strong>
-              <small>BLINK PREVIEW · CREATOR BETA</small>
-            </div>
-            <ExternalLink size={16} />
-          </div>
-          <div className={styles.blinkArt}>
-            <Image
-              src="/images/electric-relic/relics/relic-08.webp"
-              alt="Electric Relic concept form"
-              fill
-              sizes="420px"
-            />
-            <span>THE HOLLOW · FORM 008</span>
-          </div>
-          <div className={styles.blinkEquation}>
-            <span>X $TOKEN</span>
-            <Repeat2 size={16} />
-            <span>1 CORE NFT</span>
-          </div>
-          <button type="button" disabled>AWAKEN IN WALLET</button>
-          <small className={styles.previewDisclosure}>CONCEPT UI · NO TRANSACTION WILL RUN</small>
-        </div>
-
-        <div className={styles.socialCopy}>
-          <span className={styles.eyebrow}>COMING IN CREATOR BETA</span>
-          <h2>TURN THE TIMELINE INTO A PORTAL.</h2>
-          <p>
-            Share a World as a Solana Blink. Supported clients prepare the
-            transaction in-feed; everyone else lands on the verified World page.
-          </p>
-          <div className={styles.socialFlow}>
-            <span>POST</span><ChevronRight size={14} />
-            <span>PREVIEW</span><ChevronRight size={14} />
-            <span>WALLET</span><ChevronRight size={14} />
-            <span>RECEIPT</span>
-          </div>
-          <small>EVERY TRANSACTION STILL REQUIRES WALLET APPROVAL.</small>
-          <Link href="/create">
-            BUILD THE FIRST WORLDS <ArrowRight size={17} />
-          </Link>
+          <span className={styles.makerHalo} />
+          <i className={styles.makerScan} />
+          <Image src="/images/electric-relic/brand/maker-idle.png" alt="" fill sizes="(max-width: 760px) 260px, 430px" />
+          <div><small>THE MAKER</small><strong>WORLD 000 / READY</strong></div>
         </div>
       </div>
     </section>
@@ -585,43 +665,27 @@ function SocialPortal() {
 function Footer() {
   return (
     <footer className={styles.footer}>
-      <div className={styles.footerInner}>
-        <div className={styles.footerBrand}>
-          <ProductMark className={styles.brand} />
-          <span>POWERED BY 212 PROTOCOL</span>
-        </div>
-        <p>MARKETPLACES LIST ASSETS.<br /><b>ELECTRIC RELIC GIVES THEM A LOOP.</b></p>
-        <div className={styles.footerLinks}>
-          <a href="#loop">THE LOOP</a>
-          <a href="#worlds">WORLDS</a>
-          <Link href="/pump">CHECK TOKEN</Link>
-          <Link href="/create">APPLY</Link>
-          <a
-            href="https://www.metaplex.com/docs/smart-contracts/mpl-hybrid"
-            target="_blank"
-            rel="noreferrer"
-          >
-            MPL-HYBRID <ExternalLink size={12} />
-          </a>
-        </div>
-      </div>
-      <div className={styles.footerLegal}>
-        <span>FOUNDING PREVIEW · MAINNET SWAPS LOCKED</span>
-        <span>© 2026 ELECTRIC RELIC</span>
-      </div>
+      <div><ProductMark className={styles.footerBrand} /><span>THE HOME OF THE 212 STANDARD</span></div>
+      <p>ONE TOKEN. TWO FORMS.<br /><b>WELCOME TO THE REAL WORLD.</b></p>
+      <nav aria-label="Footer navigation">
+        <a href="#standard">212</a>
+        <a href="#rewards">REWARDS</a>
+        <Link href="/pump">CHECK</Link>
+        <Link href="/create">LAUNCH</Link>
+      </nav>
+      <small>FOUNDING PREVIEW · MAINNET SWAPS LOCKED</small>
     </footer>
   )
 }
 
 export default function ElectricRelicSite() {
   return (
-    <main className={`er-site ${styles.site}`}>
+    <main className={styles.site}>
       <Header />
       <Hero />
-      <Loop />
+      <Standard />
+      <Rewards />
       <Worlds />
-      <Creators />
-      <SocialPortal />
       <Footer />
     </main>
   )

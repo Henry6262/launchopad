@@ -69,7 +69,7 @@ const verdictCopy = {
     eyebrow: "NOT COMPATIBLE",
     title: "PUMP COIN USES TOKEN-2022",
     summary:
-      "The current Electric Relic Hybrid lane requires a classic SPL mint. This coin cannot enter the founding beta as configured.",
+      "The current RELIC.FUN Hybrid lane requires a classic SPL mint. This coin cannot enter the founding beta as configured.",
     tone: "fail",
   },
   NOT_A_PUMP_COIN: {
@@ -139,7 +139,7 @@ export default function PumpMintChecker() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <Link href="/" aria-label="Electric Relic home">
+        <Link href="/" aria-label="RELIC.FUN home">
           <ProductMark className={styles.brand} />
         </Link>
         <span>READ-ONLY PUMP CHECK</span>
@@ -148,7 +148,7 @@ export default function PumpMintChecker() {
 
       <section className={styles.hero}>
         <Link className={styles.back} href="/">
-          <ArrowLeft size={15} /> ELECTRIC RELIC
+          <ArrowLeft size={15} /> RELIC.FUN
         </Link>
         <span className={styles.kicker}>PUMP PROVENANCE × TOKEN STANDARD</span>
         <h1>
@@ -156,7 +156,7 @@ export default function PumpMintChecker() {
           <em>BEFORE THE WORLD.</em>
         </h1>
         <p>
-          Paste an existing Pump mint. Electric Relic reads its mint owner and
+          Paste an existing Pump mint. RELIC.FUN reads its mint owner and
           canonical bonding-curve accounts—without connecting a wallet or
           creating a transaction.
         </p>

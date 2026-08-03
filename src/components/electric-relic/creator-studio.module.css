@@ -420,6 +420,11 @@
   cursor: not-allowed;
 }
 
+.fieldGrid input:read-only {
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.018);
+}
+
 .fieldGrid label > small {
   color: rgba(255, 255, 255, 0.66);
   font-size: 11px;
@@ -428,6 +433,133 @@
 
 .wideField {
   grid-column: 1 / -1;
+}
+
+.coinCheckBar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 9px;
+}
+
+.coinCheckBar button,
+.presetButton {
+  display: flex;
+  min-height: 49px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid rgba(184, 255, 40, 0.25);
+  border-radius: 15px;
+  background: rgba(184, 255, 40, 0.055);
+  color: var(--lime);
+  font-family: monospace;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+}
+
+.coinCheckBar button:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+
+.inspectionReceipt {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.018);
+  color: rgba(255, 255, 255, 0.34);
+}
+
+.inspectionReceipt span {
+  display: grid;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.inspectionReceipt b {
+  color: white;
+  font-family: monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.inspectionPassed {
+  border-color: rgba(184, 255, 40, 0.26);
+  background: rgba(184, 255, 40, 0.045);
+  color: var(--lime);
+}
+
+.inspectionFailed {
+  border-color: rgba(255, 96, 72, 0.25);
+  background: rgba(255, 96, 72, 0.045);
+  color: #ff806d;
+}
+
+.choiceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.choiceGrid > button {
+  display: flex;
+  min-height: 90px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.34);
+  text-align: left;
+  cursor: pointer;
+}
+
+.choiceGrid > button span {
+  display: grid;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.choiceGrid > button b {
+  color: white;
+  font-family: monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.choiceGrid > button:hover,
+.choiceGrid > .activeChoice {
+  border-color: rgba(184, 255, 40, 0.32);
+  background: rgba(184, 255, 40, 0.05);
+  color: var(--lime);
+}
+
+.presetButton {
+  min-height: 76px;
+  flex-direction: column;
+  border-radius: 17px;
+}
+
+.presetButton b {
+  font-family: "Rebond", "Mona Sans", sans-serif;
+  font-size: 24px;
+  line-height: 0.9;
+}
+
+.presetButton span {
+  font-size: 8px;
 }
 
 .prefixedInput,
@@ -595,6 +727,244 @@
   font-family: monospace;
   font-size: 10px;
   letter-spacing: 0.07em;
+}
+
+.assetPreviewGrid {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.assetPreviewHeader {
+  display: flex;
+  min-height: 43px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 13px;
+  border-bottom: 1px solid var(--line);
+  color: var(--lime);
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.assetPreviewHeader b {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 7px;
+}
+
+.assetPreviewGrid > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 7px;
+  padding: 9px;
+}
+
+.assetPreviewGrid figure {
+  min-width: 0;
+  margin: 0;
+}
+
+.assetPreviewGrid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #050807;
+}
+
+.assetPreviewGrid figcaption {
+  overflow: hidden;
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.34);
+  font-family: monospace;
+  font-size: 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scenarioPicker {
+  display: grid;
+  gap: 9px;
+}
+
+.scenarioPicker > span {
+  color: rgba(255, 255, 255, 0.52);
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.scenarioPicker > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.scenarioPicker button {
+  min-height: 47px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.4);
+  font-family: "Rebond", "Mona Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.scenarioPicker button:hover,
+.scenarioPicker .activeScenario {
+  border-color: rgba(184, 255, 40, 0.3);
+  background: rgba(184, 255, 40, 0.055);
+  color: var(--lime);
+}
+
+.reserveModel {
+  overflow: hidden;
+  border: 1px solid rgba(184, 255, 40, 0.18);
+  border-radius: 20px;
+  background: rgba(184, 255, 40, 0.025);
+}
+
+.reserveModelHeader {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 15px;
+  border-bottom: 1px solid var(--line);
+  color: var(--lime);
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.reserveModelHeader span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reserveModelHeader b {
+  color: #f2b94b;
+  font-size: 7px;
+}
+
+.reserveMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+}
+
+.reserveMetrics article {
+  display: grid;
+  min-height: 76px;
+  align-content: center;
+  gap: 6px;
+  padding: 12px;
+  background: #080c0b;
+}
+
+.reserveMetrics small {
+  color: rgba(255, 255, 255, 0.35);
+  font-family: monospace;
+  font-size: 7px;
+  letter-spacing: 0.07em;
+}
+
+.reserveMetrics b {
+  overflow-wrap: anywhere;
+  color: white;
+  font-family: "Rebond", "Mona Sans", sans-serif;
+  font-size: 13px;
+}
+
+.reserveMeter {
+  height: 7px;
+  margin: 14px 15px 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.reserveMeter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7bff2b, var(--lime));
+  box-shadow: 0 0 14px rgba(184, 255, 40, 0.35);
+}
+
+.reserveModel > p {
+  margin: 0;
+  padding: 12px 15px 15px;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.selectWrap {
+  display: grid;
+  min-height: 49px;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 9px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--lime);
+}
+
+.selectWrap select {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: white;
+  font-family: monospace;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.selectWrap option {
+  color: black;
+}
+
+.controlBadge {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 15px;
+  border: 1px solid rgba(121, 160, 255, 0.2);
+  border-radius: 16px;
+  background: rgba(121, 160, 255, 0.04);
+  color: var(--blue);
+}
+
+.controlBadge span {
+  display: grid;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.controlBadge b {
+  color: white;
+  font-family: monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
 }
 
 .rerollToggle {
@@ -779,10 +1149,17 @@
 
 .review dd {
   margin: 0;
+  overflow-wrap: anywhere;
   color: white;
   font-family: "Rebond", "Mona Sans", sans-serif;
   font-size: 13px;
   font-weight: 900;
+}
+
+.reviewActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .copyButton {
@@ -1061,7 +1438,8 @@
 }
 
 .previewEquation small,
-.previewEvolution small {
+.previewEvolution small,
+.previewReserve small {
   color: rgba(255, 255, 255, 0.66);
   font-family: monospace;
   font-size: 9px;
@@ -1069,13 +1447,15 @@
 }
 
 .previewEquation b,
-.previewEvolution b {
+.previewEvolution b,
+.previewReserve b {
   color: white;
   font-family: "Rebond", "Mona Sans", sans-serif;
   font-size: 13px;
 }
 
-.previewEvolution {
+.previewEvolution,
+.previewReserve {
   display: flex;
   min-height: 68px;
   align-items: center;
@@ -1085,9 +1465,14 @@
   color: var(--blue);
 }
 
-.previewEvolution span {
+.previewEvolution span,
+.previewReserve span {
   display: grid;
   gap: 4px;
+}
+
+.previewReserve {
+  color: var(--lime);
 }
 
 .previewFooter {
@@ -1160,6 +1545,7 @@
   }
 
   .previewEvolution,
+  .previewReserve,
   .previewFooter {
     display: none;
   }
@@ -1187,7 +1573,8 @@
   }
 
   .stepRail nav {
-    grid-template-columns: repeat(5, 1fr);
+    grid-auto-columns: minmax(108px, 1fr);
+    grid-auto-flow: column;
     overflow-x: auto;
   }
 
@@ -1275,6 +1662,19 @@
     grid-template-columns: 1fr;
   }
 
+  .choiceGrid,
+  .coinCheckBar {
+    grid-template-columns: 1fr;
+  }
+
+  .assetPreviewGrid > div:last-child {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .reserveMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .choiceGroup > div > button {
     min-height: 98px;
   }
@@ -1321,11 +1721,13 @@
 
   .previewEquation,
   .previewEvolution,
+  .previewReserve,
   .previewFooter {
     display: grid;
   }
 
-  .previewEvolution {
+  .previewEvolution,
+  .previewReserve {
     display: flex;
   }
 

@@ -17,12 +17,12 @@ export async function generateMetadata({
 
   if (!world) {
     return {
-      title: "World not found — Electric Relic",
+      title: "World not found — RELIC.FUN",
     }
   }
 
   return {
-    title: `${world.manifest.name} — Electric Relic`,
+    title: `${world.manifest.name} — RELIC.FUN`,
     description: world.manifest.description,
   }
 }

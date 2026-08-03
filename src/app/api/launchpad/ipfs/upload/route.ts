@@ -110,7 +110,7 @@ export async function POST(request: Request) {
   if (!ALLOWED_MIME_TYPES.has(file.type)) {
     return errorResponse(
       "UNSUPPORTED_MEDIA_TYPE",
-      "Electric Relic V1 accepts JSON, PNG, JPEG, WebP, GIF, or AVIF files",
+      "RELIC.FUN V1 accepts JSON, PNG, JPEG, WebP, GIF, or AVIF files",
       415
     )
   }

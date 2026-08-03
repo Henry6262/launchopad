@@ -748,7 +748,7 @@ export default function DevnetCanaryConsole() {
         <section className={styles.intro}>
           <div className={styles.introCopy}>
             <Link href="/" className={styles.backLink}>
-              <ArrowLeft size={14} /> BACK TO ELECTRIC RELIC
+              <ArrowLeft size={14} /> BACK TO RELIC.FUN
             </Link>
             <span className={styles.eyebrow}>
               <i /> OPERATOR PROOF / SOLANA DEVNET

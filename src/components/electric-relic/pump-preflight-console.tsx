@@ -167,7 +167,7 @@ export default function PumpPreflightConsole() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <Link href="/" aria-label="Back to Electric Relic">
+        <Link href="/" aria-label="Back to RELIC.FUN">
           <ProductMark className={styles.brand} />
         </Link>
         <span>
@@ -181,7 +181,7 @@ export default function PumpPreflightConsole() {
         <div className={styles.heroCopy}>
           <Link href="/">
             <ArrowLeft size={15} />
-            ELECTRIC RELIC
+            RELIC.FUN
           </Link>
           <span className={styles.kicker}>
             <FlaskConical size={15} />
@@ -192,13 +192,13 @@ export default function PumpPreflightConsole() {
             <em>BEFORE WE RISK MAINNET.</em>
           </h1>
           <p>
-            Pump launches and trades the coin. Electric Relic adds the
+            Pump launches and trades the coin. RELIC.FUN adds the
             reversible NFT World. This lab checks only whether Pump&apos;s
             deprecated classic-SPL creation instruction still simulates. It
             does not verify Hybrid safety.
           </p>
         </div>
-        <div className={styles.flow} aria-label="Pump to Electric Relic flow">
+        <div className={styles.flow} aria-label="Pump to RELIC.FUN flow">
           <span>
             <b>PUMP</b>
             COIN + CURVE
@@ -248,7 +248,7 @@ export default function PumpPreflightConsole() {
               value={name}
               onChange={(event) => setName(event.target.value)}
               maxLength={32}
-              placeholder="Electric Relic Canary"
+              placeholder="RELIC.FUN Canary"
             />
             <small>{name.length} / 32</small>
           </label>

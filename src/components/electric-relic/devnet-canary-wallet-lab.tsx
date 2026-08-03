@@ -802,7 +802,7 @@ async function acquireExclusiveCanarySigningLock(): Promise<() => void> {
   )
   if (!(await acquired)) {
     throw new Error(
-      "ANOTHER ELECTRIC RELIC TAB IS SIGNING · NOTHING WAS SENT"
+      "ANOTHER RELIC.FUN TAB IS SIGNING · NOTHING WAS SENT"
     )
   }
   return () => releaseHold()

@@ -2,9 +2,9 @@ import type { Metadata } from "next"
 import CreatorStudio from "@/components/electric-relic/creator-studio"
 
 export const metadata: Metadata = {
-  title: "Create a World — Electric Relic",
+  title: "Launch on 212 — RELIC.FUN",
   description:
-    "Configure a token-backed NFT world, preview its rites, and save an application draft locally.",
+    "Build a reviewable Pump-to-NFT World across Project, Coin, Collection, Forms, Mechanics, Reserve, Control, and Covenant.",
 }
 
 export default function ElectricRelicCreatePage() {
