@@ -9,30 +9,30 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Electric Relic — Pump Coins, Now Collectible",
+  title: "Electric Relic — NFTs With an Exit",
   description:
-    "Check a compatible Pump coin and prepare a reversible NFT World for Electric Relic's curated founding beta.",
+    "The 404 launchpad for Pump communities. Awaken an NFT from a compatible token and release it back into its configured token backing.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Electric Relic — Pump Coins, Now Collectible",
+    title: "Electric Relic — NFTs With an Exit",
     description:
-      "Check the coin, model the backing, and prepare its collectible World.",
+      "Don't just launch a coin. Launch its reversible NFT World.",
     images: [
       {
-        url: "/images/electric-relic/og-social.png",
+        url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Electric Relic — one token, two forms",
+        alt: "Electric Relic — NFTs with an exit",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Electric Relic — Pump Coins, Now Collectible",
-    description: "Check the coin, model the backing, and prepare its collectible World.",
-    images: ["/images/electric-relic/og-social.png"],
+    title: "Electric Relic — NFTs With an Exit",
+    description: "Don't just launch a coin. Launch its reversible NFT World.",
+    images: ["/og.png"],
   },
   icons: {
     icon: "/images/electric-relic/favicon.svg",

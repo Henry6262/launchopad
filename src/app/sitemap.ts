@@ -13,5 +13,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.7,
     },
+    {
+      url: `${siteUrl}/world/devnet-canary`,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
   ]
 }

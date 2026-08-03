@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Electric Relic",
     short_name: "Electric Relic",
     description:
-      "Read-only Pump compatibility and curated reversible NFT World applications.",
+      "The 404 launchpad for compatible Pump communities and reversible NFT Worlds.",
     start_url: "/",
     display: "standalone",
     background_color: "#030604",
