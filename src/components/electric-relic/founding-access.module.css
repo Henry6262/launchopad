@@ -17,19 +17,19 @@
 .accessIcon { display:grid; width:42px; aspect-ratio:1; place-items:center; border:1px solid rgba(183,255,50,.22); border-radius:14px; background:rgba(183,255,50,.06); color:#b7ff32; }
 .accessIcon svg { width:18px; }
 .accessCopy { display:grid; gap:3px; min-width:0; }
-.accessCopy small { color:#b7ff32; font-family:monospace; font-size:6px; font-weight:900; letter-spacing:.12em; }
-.accessCopy strong { color:white; font-family:"Rebond",sans-serif; font-size:17px; font-weight:900; letter-spacing:-.035em; }
-.accessCopy span { color:rgba(244,245,236,.43); font-size:10px; line-height:1.4; }
-.accessActions a,.accessActions button { display:flex; min-height:42px; align-items:center; justify-content:center; gap:8px; padding:0 14px; border:0; border-radius:13px; background:#b7ff32; color:#071002; font-family:monospace; font-size:7px; font-weight:900; letter-spacing:.08em; cursor:pointer; white-space:nowrap; }
+.accessCopy small { color:#b7ff32; font-family:monospace; font-size:8px; font-weight:900; letter-spacing:.1em; }
+.accessCopy strong { color:white; font-family:"Rebond",sans-serif; font-size:19px; font-weight:900; letter-spacing:-.035em; }
+.accessCopy span { color:rgba(244,245,236,.43); font-size:12px; line-height:1.4; }
+.accessActions a,.accessActions button { display:flex; min-height:42px; align-items:center; justify-content:center; gap:8px; padding:0 14px; border:0; border-radius:13px; background:#b7ff32; color:#071002; font-family:monospace; font-size:9px; font-weight:900; letter-spacing:.07em; cursor:pointer; white-space:nowrap; }
 .accessActions button:disabled { background:rgba(244,245,236,.08); color:rgba(244,245,236,.3); cursor:not-allowed; }
 .accessId { display:grid; width:100%; gap:6px; padding:11px 13px; border:1px solid rgba(244,245,236,.1); border-radius:13px; background:rgba(0,0,0,.18); }
-.accessId small { color:rgba(244,245,236,.3); font-family:monospace; font-size:6px; font-weight:900; letter-spacing:.12em; }
-.accessId code { overflow:hidden; color:rgba(244,245,236,.6); font-size:8px; text-overflow:ellipsis; white-space:nowrap; }
-.backLink { display:flex; align-items:center; gap:7px; color:rgba(244,245,236,.36); font-family:monospace; font-size:7px; font-weight:900; letter-spacing:.1em; }
+.accessId small { color:rgba(244,245,236,.3); font-family:monospace; font-size:8px; font-weight:900; letter-spacing:.1em; }
+.accessId code { overflow:hidden; color:rgba(244,245,236,.6); font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+.backLink { display:flex; align-items:center; gap:7px; color:rgba(244,245,236,.36); font-family:monospace; font-size:9px; font-weight:900; letter-spacing:.09em; }
 .dock { width:100%; max-width:650px; margin-top:24px; padding:10px; border:1px solid rgba(244,245,236,.13); border-radius:19px; background:rgba(5,8,6,.72); box-shadow:0 18px 45px rgba(0,0,0,.25); backdrop-filter:blur(18px); }
 .dock .accessIcon { width:38px; border-radius:12px; }
-.dock .accessCopy strong { font-size:14px; }
-.dock .accessCopy span { font-size:9px; }
+.dock .accessCopy strong { font-size:16px; }
+.dock .accessCopy span { font-size:11px; }
 .spin { animation:spin 1s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 @keyframes gateOrbit { from { transform:rotate(0deg) translateX(66px) rotate(0deg); } to { transform:rotate(360deg) translateX(66px) rotate(-360deg); } }
