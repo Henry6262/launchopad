@@ -35,6 +35,8 @@ export ER_CANARY_RPC="${ELECTRIC_RELIC_SOLANA_DEVNET_RPC_URL:-https://api.devnet
 export ER_CANARY_KEYPAIR=".secrets/electric-relic-devnet-operator.json"
 export ER_CANARY_STATE=".secrets/electric-relic-devnet-canary.json"
 export ER_CANARY_METADATA="https://electric-relic.vercel.app/canary/"
+export ELECTRIC_RELIC_CANARY_WRITES_ENABLED=false
+export ELECTRIC_RELIC_CANARY_TESTER_WALLET=""
 ```
 
 Both `.secrets` files are ignored by Git and written with mode `0600`. The
@@ -216,7 +218,81 @@ npm run canary -- inspect \
 Do not use a long local `sleep`; preserve the start evidence and return after
 the observation period.
 
-## 7. Interrupted transaction recovery
+## 7. Allocate the canary to one browser tester
+
+Run this optional terminal step only after the operator endurance run is
+complete. It permanently binds the private canary state to one tester, creates
+that wallet's classic-SPL associated token account idempotently, and transfers
+the exact backing amount with `TransferChecked`. The command also tops up the
+tester from the operator to exactly 0.02 devnet SOL when the tester is below
+that threshold. It never requests mainnet funds or uses a hosted signer.
+
+Choose one canonical on-curve wallet address. Configure the same value for the
+server-side browser allowlist and the allocation command:
+
+```sh
+export ELECTRIC_RELIC_CANARY_TESTER_WALLET="<REVIEWED_DEVNET_TESTER_PUBLIC_KEY>"
+export ELECTRIC_RELIC_CANARY_WRITES_ENABLED=true
+
+npm run canary -- allocate \
+  --ack-devnet-only \
+  --recipient "$ELECTRIC_RELIC_CANARY_TESTER_WALLET" \
+  --rpc "$ER_CANARY_RPC" \
+  --keypair "$ER_CANARY_KEYPAIR" \
+  --state "$ER_CANARY_STATE"
+
+# Close the write window immediately after the reviewed operation. Enable it
+# separately in the deployed environment only while the tester is exercising
+# the browser canary.
+export ELECTRIC_RELIC_CANARY_WRITES_ENABLED=false
+```
+
+The deployed browser route has stricter gates than the local allocation
+command. It also requires a configured HTTPS devnet RPC, an absolute UTC
+opening and expiry no more than two hours apart, and a reviewed commit equal to
+Vercel's `VERCEL_GIT_COMMIT_SHA`:
+
+```sh
+ELECTRIC_RELIC_CANARY_GATE_OPENS_AT=2026-08-03T18:00:00Z
+ELECTRIC_RELIC_CANARY_GATE_EXPIRES_AT=2026-08-03T20:00:00Z
+ELECTRIC_RELIC_CANARY_REVIEWED_COMMIT_SHA=<EXACT_40_CHARACTER_DEPLOYED_SHA>
+```
+
+An environment change does not alter an already running deployment. Pre-stage
+the gate-off deployment before opening this short test window, freeze code
+deployments while it is open, and promote the off deployment immediately after
+the round trip. The absolute expiry still closes transaction preparation if
+that operational step is delayed.
+
+Before the deployed gate is opened, add a shared Vercel Firewall/WAF rate limit
+for `POST /api/launchpad/devnet-canary/prepare` and the state endpoint. The
+in-process quota is defense in depth only; it is not shared across serverless
+instances. Keep the gate closed if the edge quota and reviewed HTTPS devnet RPC
+are not both active.
+
+The command refuses to send unless all of the following are proven from
+finalized state:
+
+- the pinned devnet genesis and MPL-Hybrid ProgramData still match;
+- the known NFT is in escrow, no NFT is active, and the Hybrid reserve is zero;
+- total classic-token supply equals exactly one backing amount;
+- the operator ATA holds that entire supply and the tester ATA holds zero; and
+- an existing tester assignment is absent or exactly matches `--recipient`.
+
+The ATA creation, exact token transfer, and optional SOL top-up are one atomic
+transaction. The signed transaction signature and tester wallet are saved
+before broadcast. After finalization the command proves the operator token
+balance is zero, the tester holds the exact backing amount and at least 0.02
+devnet SOL, escrow custody is unchanged, and all reserve invariants still pass.
+If submission or confirmation is interrupted, do not run `allocate` again;
+follow the recovery procedure below.
+
+Allocation ends the operator-driven soak phase: subsequent Awaken and Release
+actions belong to the allowlisted tester wallet. Never import or expose the
+local operator key in a browser, and never allocate to a second address by
+editing the state file.
+
+## 8. Interrupted transaction recovery
 
 The harness writes an action and transaction signature to `state.pending`
 immediately after submission and before waiting for finalization. If the process
@@ -251,12 +327,14 @@ The following statuses retain `state.pending` and require the operator to halt:
 - `FINALIZED_SUCCESS_RECONCILIATION_MISMATCH`; or
 - `FINALIZED_SUCCESS_SETUP_ACTION_RETAINED`.
 
-Setup actions are intentionally never auto-cleared because each needs
-action-specific account review. Never clear `pending` manually, rerun `setup`,
-or replay an action. If final status and expected state cannot be proven, retain
-the private backup and signature for protocol review.
+Tester allocation is auto-cleared only when finalized success plus the exact
+tester token/SOL balances and unchanged escrow state are proven. Other setup
+actions are intentionally never auto-cleared because each needs action-specific
+account review. Never clear `pending` manually, rerun `setup`, or replay an
+action. If final status and expected state cannot be proven, retain the private
+backup and signature for protocol review.
 
-## 8. Public evidence versus secrets
+## 9. Public evidence versus secrets
 
 After a successful inspection, the command output is a candidate public
 artifact: it removes the RPC path and query and contains public addresses,
@@ -299,7 +377,9 @@ approval.
 ## Mainnet remains blocked
 
 This devnet harness has a hard genesis guard and no mainnet-write flag. Do not
-remove or bypass either control. Mainnet remains blocked because this canary:
+remove or bypass either control. `ELECTRIC_RELIC_CANARY_WRITES_ENABLED` opens
+only the pinned devnet tester path; it is not a cluster selector or mainnet
+approval. Mainnet remains blocked because this canary:
 
 - uses an automated local software key rather than the approved 2-of-3
   authority workflow;

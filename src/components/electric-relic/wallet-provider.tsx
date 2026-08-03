@@ -30,9 +30,11 @@ export default function ElectricRelicWalletProvider({
   children: React.ReactNode
 }) {
   const endpoint = useMemo(
-    () =>
-      process.env.NEXT_PUBLIC_SOLANA_RPC_URL?.trim() ||
-      clusterApiUrl("devnet"),
+    // V1 wallet actions are isolated to the valueless canary. Do not make the
+    // browser wallet cluster configurable until a separate reviewed mainnet
+    // client exists. The canary also verifies the devnet genesis before every
+    // prepare/sign/send sequence.
+    () => clusterApiUrl("devnet"),
     []
   )
   const wallets = useMemo(() => [new PhantomWalletAdapter()], [])

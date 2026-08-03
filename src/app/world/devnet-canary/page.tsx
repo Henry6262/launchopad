@@ -4,7 +4,7 @@ import DevnetCanaryConsole from "@/components/electric-relic/devnet-canary-conso
 export const metadata: Metadata = {
   title: "Devnet Canary — Electric Relic",
   description:
-    "Read-only operator evidence for Electric Relic's reversible MPL-Hybrid devnet canary.",
+    "Public proof and a fail-closed wallet-signed lab for Electric Relic's reversible MPL-Hybrid devnet canary.",
   robots: {
     index: false,
     follow: false,

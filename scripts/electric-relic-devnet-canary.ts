@@ -4,6 +4,8 @@ import path from "node:path"
 import {
   AuthorityType,
   TOKEN_PROGRAM_ID,
+  createAssociatedTokenAccountIdempotentInstruction,
+  createTransferCheckedInstruction,
   createMint,
   getAccount,
   getAssociatedTokenAddressSync,
@@ -12,6 +14,7 @@ import {
   mintTo,
   setAuthority,
   unpackAccount,
+  unpackMint,
 } from "@solana/spl-token"
 import {
   type AccountInfo,
@@ -19,6 +22,9 @@ import {
   Keypair,
   LAMPORTS_PER_SOL,
   PublicKey,
+  SystemProgram,
+  Transaction,
+  VersionedTransaction,
 } from "@solana/web3.js"
 import {
   MPL_CORE_PROGRAM_ID,
@@ -71,6 +77,7 @@ const DEFAULT_STATE_PATH = ".secrets/electric-relic-devnet-canary.json"
 const DEFAULT_PUBLIC_MANIFEST_PATH = "public/canary/devnet-manifest.json"
 const DEFAULT_METADATA_BASE = "https://electric-relic.vercel.app/canary/"
 const DEFAULT_BACKING_ATOMIC = "1000000"
+const TESTER_MINIMUM_SOL_LAMPORTS = 20_000_000
 const PINNED_MPL_HYBRID_DEVNET_DEPLOYMENT = {
   programAddress: "MPL4o4wMzndgh8T1NVDxELQCj5UQfYTYEkabX3wNKtb",
   programDataAddress: "9RRs8kE5eq1xno8G9mNG5vWGcYbDWRNjdoSnfvDWhjT3",
@@ -95,6 +102,7 @@ type CanaryCommand =
   | "setup"
   | "inspect"
   | "publish"
+  | "allocate"
   | "awaken"
   | "release"
   | "roundtrip"
@@ -106,6 +114,7 @@ type RecordedAction =
   | "CREATE_COLLECTION"
   | "CREATE_ASSET"
   | "FUND_ESCROW_ASSET"
+  | "ALLOCATE_TESTER"
   | "AWAKEN"
   | "RELEASE"
 
@@ -124,6 +133,7 @@ interface CanaryState {
   createdAt: string
   updatedAt: string
   operator: string
+  testerWallet?: string | null
   feeLocation: string | null
   token: {
     mint: string | null
@@ -204,6 +214,16 @@ interface ProgramObservation {
   executableBytes: number
 }
 
+interface TesterAllocationObservation {
+  slot: number
+  assetOwner: string
+  escrowReserveAtomic: string
+  mintSupplyAtomic: string
+  operatorTokenAtomic: string
+  recipientTokenAtomic: string
+  recipientSolLamports: number
+}
+
 const command = process.argv[2] as CanaryCommand | undefined
 const args = parseArgs(process.argv.slice(3))
 const keypairPath = path.resolve(args.keypair ?? DEFAULT_KEYPAIR_PATH)
@@ -220,7 +240,7 @@ runCli().catch((error) => {
 async function runCli() {
   if (
     !command ||
-    !["bootstrap", "setup", "inspect", "publish", "awaken", "release", "roundtrip", "soak"].includes(
+    !["bootstrap", "setup", "inspect", "publish", "allocate", "awaken", "release", "roundtrip", "soak"].includes(
       command
     )
   ) {
@@ -241,6 +261,11 @@ async function main(selectedCommand: CanaryCommand) {
       "Refusing to continue without --ack-devnet-only. This harness must never target mainnet."
     )
   }
+
+  const allocationRecipient =
+    selectedCommand === "allocate"
+      ? requireAllocationRecipient()
+      : null
 
   const connection = new Connection(rpcUrl, "finalized")
   const genesisHash = await connection.getGenesisHash()
@@ -319,7 +344,15 @@ async function main(selectedCommand: CanaryCommand) {
     )
   }
 
-  if (selectedCommand === "awaken") {
+  if (selectedCommand === "allocate") {
+    await runAllocateTester(
+      connection,
+      umi,
+      operator,
+      state,
+      requireValue(allocationRecipient, "allocation recipient")
+    )
+  } else if (selectedCommand === "awaken") {
     await runAwaken(connection, umi, state)
   } else if (selectedCommand === "release") {
     await runRelease(connection, umi, state)
@@ -527,6 +560,187 @@ async function setupCanary(
   await saveState(statePath, state)
 }
 
+async function runAllocateTester(
+  connection: Connection,
+  umi: Umi,
+  operator: Keypair,
+  state: CanaryState,
+  recipient: PublicKey
+) {
+  const recipientAddress = recipient.toBase58()
+  if (recipient.equals(operator.publicKey)) {
+    throw new Error("Tester recipient must be different from the canary operator")
+  }
+  if (
+    state.testerWallet !== null &&
+    state.testerWallet !== undefined &&
+    state.testerWallet !== recipientAddress
+  ) {
+    throw new Error(
+      `Canary state is already assigned to tester ${state.testerWallet}; refusing to overwrite it`
+    )
+  }
+
+  const before = await reconcile(connection, umi, state)
+  assertSafe(before, "pre-allocation state")
+  if (
+    before.assetOwner !== state.escrow ||
+    before.activeNftCount !== 0 ||
+    before.tokenReserveAtomic !== "0"
+  ) {
+    throw new Error(
+      "Tester allocation requires the known asset in escrow with zero active NFTs and zero token reserve"
+    )
+  }
+
+  const allocationBefore = await observeTesterAllocation(
+    connection,
+    state,
+    recipient
+  )
+  assertTesterAllocationBefore(state, allocationBefore)
+
+  const mint = new PublicKey(requireValue(state.token.mint, "token mint"))
+  const operatorAta = getAssociatedTokenAddressSync(
+    mint,
+    operator.publicKey,
+    false,
+    TOKEN_PROGRAM_ID
+  )
+  const recipientAta = getAssociatedTokenAddressSync(
+    mint,
+    recipient,
+    false,
+    TOKEN_PROGRAM_ID
+  )
+  const backing = BigInt(state.backingPerNftAtomic)
+  const testerFundingLamports = Math.max(
+    0,
+    TESTER_MINIMUM_SOL_LAMPORTS - allocationBefore.recipientSolLamports
+  )
+
+  const latestBlockhash = await connection.getLatestBlockhash("finalized")
+  const transaction = new Transaction({
+    feePayer: operator.publicKey,
+    blockhash: latestBlockhash.blockhash,
+    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+  }).add(
+    createAssociatedTokenAccountIdempotentInstruction(
+      operator.publicKey,
+      recipientAta,
+      recipient,
+      mint,
+      TOKEN_PROGRAM_ID
+    ),
+    createTransferCheckedInstruction(
+      operatorAta,
+      mint,
+      recipientAta,
+      operator.publicKey,
+      backing,
+      state.token.decimals,
+      [],
+      TOKEN_PROGRAM_ID
+    )
+  )
+  if (testerFundingLamports > 0) {
+    transaction.add(
+      SystemProgram.transfer({
+        fromPubkey: operator.publicKey,
+        toPubkey: recipient,
+        lamports: testerFundingLamports,
+      })
+    )
+  }
+
+  transaction.sign(operator)
+  const transactionSignature = transaction.signature
+  if (!transactionSignature) {
+    throw new Error("Tester allocation transaction did not produce an operator signature")
+  }
+  const simulation = await connection.simulateTransaction(
+    VersionedTransaction.deserialize(transaction.serialize()),
+    {
+    commitment: "finalized",
+    sigVerify: true,
+    }
+  )
+  if (simulation.value.err) {
+    throw new Error(
+      `Tester allocation simulation failed before evidence was persisted: ${JSON.stringify(simulation.value.err)}`
+    )
+  }
+  const signature = base58.deserialize(
+    Uint8Array.from(transactionSignature)
+  )[0]
+
+  // Bind the tester and persist the exact signature before broadcast. If the
+  // RPC response is interrupted after accepting the bytes, `inspect` can
+  // recover only this fixed recipient rather than sending a second allocation.
+  state.testerWallet = recipientAddress
+  state.pending = {
+    id: randomUUID(),
+    action: "ALLOCATE_TESTER",
+    signature,
+    submittedAt: new Date().toISOString(),
+  }
+  await saveState(statePath, state)
+
+  const submittedSignature = await connection.sendRawTransaction(
+    transaction.serialize(),
+    {
+      skipPreflight: false,
+      preflightCommitment: "finalized",
+      maxRetries: 3,
+    }
+  )
+  if (submittedSignature !== signature) {
+    throw new Error(
+      "RPC returned a different signature for the signed tester allocation transaction"
+    )
+  }
+
+  const confirmation = await connection.confirmTransaction(
+    {
+      signature,
+      blockhash: latestBlockhash.blockhash,
+      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    },
+    "finalized"
+  )
+  if (confirmation.value.err) {
+    throw new Error(
+      `ALLOCATE_TESTER failed: ${JSON.stringify(confirmation.value.err)}`
+    )
+  }
+
+  const finalProgramObservation = await observeProgram(connection)
+  assertRecordedProgramMatches(
+    state.programObservation,
+    finalProgramObservation
+  )
+  const after = await reconcile(connection, umi, state)
+  assertSafe(after, "post-allocation state")
+  const allocationAfter = await observeTesterAllocation(
+    connection,
+    state,
+    recipient
+  )
+  assertTesterAllocationAfter(state, allocationAfter)
+
+  state.signatures.ALLOCATE_TESTER = [
+    ...(state.signatures.ALLOCATE_TESTER ?? []),
+    signature,
+  ]
+  state.pending = null
+  state.programObservation = finalProgramObservation
+  state.lastSnapshot = after
+  await saveState(statePath, state)
+  process.stdout.write(
+    `ALLOCATE_TESTER: ${signature} recipient=${recipientAddress} tokenAccount=${recipientAta.toBase58()} topUpLamports=${testerFundingLamports}\n`
+  )
+}
+
 async function runAwaken(connection: Connection, umi: Umi, state: CanaryState) {
   const before = await reconcile(connection, umi, state)
   assertSafe(before, "pre-Awaken state")
@@ -705,7 +919,9 @@ async function reconcile(
 
   const assetOwner = String(asset.owner)
   const ownerRecognized =
-    assetOwner === escrow || assetOwner === state.operator
+    assetOwner === escrow ||
+    assetOwner === state.operator ||
+    assetOwner === state.testerWallet
   const escrowNftCount = assetOwner === escrow ? 1 : 0
   const activeNftCount = 1 - escrowNftCount
   const tokenReserveAtomic = reserve.amount
@@ -732,6 +948,175 @@ async function reconcile(
     exactReserveMatch,
     inventoryConserved,
     safe: exactReserveMatch && inventoryConserved && ownerRecognized,
+  }
+}
+
+async function observeTesterAllocation(
+  connection: Connection,
+  state: CanaryState,
+  recipient: PublicKey
+): Promise<TesterAllocationObservation> {
+  const assetAddress = new PublicKey(requireValue(state.asset, "asset"))
+  const collectionAddress = requireValue(state.collection, "collection")
+  const escrowAddress = new PublicKey(requireValue(state.escrow, "escrow"))
+  const mintAddress = new PublicKey(requireValue(state.token.mint, "token mint"))
+  const operatorAddress = new PublicKey(state.operator)
+  const escrowAta = getAssociatedTokenAddressSync(
+    mintAddress,
+    escrowAddress,
+    true,
+    TOKEN_PROGRAM_ID
+  )
+  const operatorAta = getAssociatedTokenAddressSync(
+    mintAddress,
+    operatorAddress,
+    false,
+    TOKEN_PROGRAM_ID
+  )
+  const recipientAta = getAssociatedTokenAddressSync(
+    mintAddress,
+    recipient,
+    false,
+    TOKEN_PROGRAM_ID
+  )
+  const response = await connection.getMultipleAccountsInfoAndContext(
+    [
+      assetAddress,
+      escrowAta,
+      mintAddress,
+      operatorAta,
+      recipientAta,
+      recipient,
+    ],
+    { commitment: "finalized" }
+  )
+  const [
+    assetInfo,
+    escrowTokenInfo,
+    mintInfo,
+    operatorTokenInfo,
+    recipientTokenInfo,
+    recipientWalletInfo,
+  ] = response.value
+  if (!assetInfo || !escrowTokenInfo || !mintInfo || !operatorTokenInfo) {
+    throw new Error(
+      "Finalized tester allocation observation is missing a required canary account"
+    )
+  }
+  if (
+    assetInfo.executable ||
+    !assetInfo.owner.equals(new PublicKey(String(MPL_CORE_PROGRAM_ID)))
+  ) {
+    throw new Error("Tester allocation asset is not a canonical MPL Core account")
+  }
+
+  const asset = deserializeAssetV1(toUmiRpcAccount(assetAddress, assetInfo))
+  if (
+    asset.updateAuthority.type !== "Collection" ||
+    asset.updateAuthority.address !== collectionAddress
+  ) {
+    throw new Error("Tester allocation asset is not bound to the canary collection")
+  }
+
+  const escrowToken = unpackAccount(
+    escrowAta,
+    escrowTokenInfo,
+    TOKEN_PROGRAM_ID
+  )
+  const operatorToken = unpackAccount(
+    operatorAta,
+    operatorTokenInfo,
+    TOKEN_PROGRAM_ID
+  )
+  const recipientToken = recipientTokenInfo
+    ? unpackAccount(recipientAta, recipientTokenInfo, TOKEN_PROGRAM_ID)
+    : null
+  for (const [label, account, expectedOwner] of [
+    ["escrow", escrowToken, escrowAddress],
+    ["operator", operatorToken, operatorAddress],
+    ...(recipientToken
+      ? [["recipient", recipientToken, recipient] as const]
+      : []),
+  ] as const) {
+    if (
+      !account.mint.equals(mintAddress) ||
+      !account.owner.equals(expectedOwner) ||
+      !account.isInitialized ||
+      account.isFrozen ||
+      account.delegate !== null ||
+      account.closeAuthority !== null
+    ) {
+      throw new Error(
+        `Tester allocation ${label} token account failed canonical ownership checks`
+      )
+    }
+  }
+
+  const mint = unpackMint(mintAddress, mintInfo, TOKEN_PROGRAM_ID)
+  if (
+    !mint.isInitialized ||
+    mintInfo.data.length !== 82 ||
+    mint.decimals !== state.token.decimals ||
+    mint.mintAuthority !== null ||
+    mint.freezeAuthority !== null
+  ) {
+    throw new Error("Tester allocation mint failed the locked classic-SPL checks")
+  }
+  if (
+    recipientWalletInfo &&
+    (recipientWalletInfo.executable ||
+      !recipientWalletInfo.owner.equals(SystemProgram.programId) ||
+      recipientWalletInfo.data.length !== 0)
+  ) {
+    throw new Error("Tester recipient is not a plain system wallet")
+  }
+
+  return {
+    slot: response.context.slot,
+    assetOwner: String(asset.owner),
+    escrowReserveAtomic: escrowToken.amount.toString(),
+    mintSupplyAtomic: mint.supply.toString(),
+    operatorTokenAtomic: operatorToken.amount.toString(),
+    recipientTokenAtomic: recipientToken?.amount.toString() ?? "0",
+    recipientSolLamports: recipientWalletInfo?.lamports ?? 0,
+  }
+}
+
+function assertTesterAllocationBefore(
+  state: CanaryState,
+  observation: TesterAllocationObservation
+) {
+  const backing = state.backingPerNftAtomic
+  if (
+    observation.assetOwner !== state.escrow ||
+    observation.escrowReserveAtomic !== "0" ||
+    observation.mintSupplyAtomic !== backing ||
+    state.token.supplyAtomic !== backing ||
+    observation.operatorTokenAtomic !== backing ||
+    observation.recipientTokenAtomic !== "0"
+  ) {
+    throw new Error(
+      "Tester allocation requires the asset in escrow, zero reserve, the exact sole backing supply in the operator ATA, and an empty recipient ATA"
+    )
+  }
+}
+
+function assertTesterAllocationAfter(
+  state: CanaryState,
+  observation: TesterAllocationObservation
+) {
+  const backing = state.backingPerNftAtomic
+  if (
+    observation.assetOwner !== state.escrow ||
+    observation.escrowReserveAtomic !== "0" ||
+    observation.mintSupplyAtomic !== backing ||
+    observation.operatorTokenAtomic !== "0" ||
+    observation.recipientTokenAtomic !== backing ||
+    observation.recipientSolLamports < TESTER_MINIMUM_SOL_LAMPORTS
+  ) {
+    throw new Error(
+      "Finalized tester allocation did not preserve escrow custody or prove the exact token and SOL destination balances"
+    )
   }
 }
 
@@ -777,6 +1162,7 @@ async function createInitialState(
     createdAt: now,
     updatedAt: now,
     operator: operator.publicKey.toBase58(),
+    testerWallet: null,
     feeLocation: null,
     token: {
       mint: null,
@@ -1072,18 +1458,41 @@ async function inspectPendingSignature(
     )
   }
 
-  const expectedStateReached =
-    pending.action === "AWAKEN"
-      ? snapshot.safe &&
-        snapshot.activeNftCount === 1 &&
-        snapshot.escrowNftCount === 0 &&
-        snapshot.assetOwner === state.operator
-      : pending.action === "RELEASE"
-        ? snapshot.safe &&
+  let expectedStateReached: boolean | null = null
+  if (pending.action === "AWAKEN") {
+    expectedStateReached =
+      snapshot.safe &&
+      snapshot.activeNftCount === 1 &&
+      snapshot.escrowNftCount === 0 &&
+      snapshot.assetOwner === state.operator
+  } else if (pending.action === "RELEASE") {
+    expectedStateReached =
+      snapshot.safe &&
+      snapshot.activeNftCount === 0 &&
+      snapshot.escrowNftCount === 1 &&
+      snapshot.assetOwner === state.escrow
+  } else if (pending.action === "ALLOCATE_TESTER") {
+    if (!state.testerWallet) {
+      expectedStateReached = false
+    } else {
+      try {
+        const allocation = await observeTesterAllocation(
+          connection,
+          state,
+          new PublicKey(state.testerWallet)
+        )
+        assertTesterAllocationAfter(state, allocation)
+        expectedStateReached =
+          allocation.slot >= status.slot &&
+          snapshot.safe &&
           snapshot.activeNftCount === 0 &&
           snapshot.escrowNftCount === 1 &&
           snapshot.assetOwner === state.escrow
-        : null
+      } catch {
+        expectedStateReached = false
+      }
+    }
+  }
 
   if (expectedStateReached === null) {
     return retained(
@@ -1200,6 +1609,12 @@ async function publishPublicEvidence(
         state.signatures.RELEASE?.length ?? 0
       ),
     },
+    testerAllocation: state.testerWallet
+      ? {
+          recipient: state.testerWallet,
+          signature: state.signatures.ALLOCATE_TESTER?.at(-1) ?? null,
+        }
+      : null,
     recentSignatures,
   }
   await mkdir(path.dirname(filename), { recursive: true })
@@ -1224,6 +1639,50 @@ function parseArgs(values: string[]) {
     }
   }
   return result
+}
+
+function requireAllocationRecipient() {
+  if (process.env.ELECTRIC_RELIC_CANARY_WRITES_ENABLED !== "true") {
+    throw new Error(
+      "Tester allocation is disabled. Set ELECTRIC_RELIC_CANARY_WRITES_ENABLED=true only for the reviewed devnet operation."
+    )
+  }
+  const supplied = args.recipient?.trim()
+  if (!supplied) {
+    throw new Error("allocate requires --recipient PUBLIC_KEY")
+  }
+
+  let recipient: PublicKey
+  try {
+    recipient = new PublicKey(supplied)
+  } catch {
+    throw new Error("Tester recipient is not a valid Solana public key")
+  }
+  if (
+    recipient.toBase58() !== supplied ||
+    !PublicKey.isOnCurve(recipient.toBytes())
+  ) {
+    throw new Error("Tester recipient must be one canonical on-curve wallet address")
+  }
+
+  const configured = process.env.ELECTRIC_RELIC_CANARY_TESTER_WALLET?.trim()
+  if (!configured) {
+    throw new Error(
+      "ELECTRIC_RELIC_CANARY_TESTER_WALLET must pin the same reviewed recipient before allocation"
+    )
+  }
+  let configuredAddress: string
+  try {
+    configuredAddress = new PublicKey(configured).toBase58()
+  } catch {
+    throw new Error("ELECTRIC_RELIC_CANARY_TESTER_WALLET is malformed")
+  }
+  if (configuredAddress !== configured || configuredAddress !== supplied) {
+    throw new Error(
+      "--recipient must exactly match ELECTRIC_RELIC_CANARY_TESTER_WALLET"
+    )
+  }
+  return recipient
 }
 
 function parsePositiveInteger(value: string, label: string, maximum: number) {
@@ -1262,5 +1721,5 @@ function output(value: unknown) {
 }
 
 function usage() {
-  process.stderr.write(`Usage:\n  npm run canary -- bootstrap --ack-devnet-only\n  npm run canary -- setup --ack-devnet-only [--token-mint ADDRESS]\n  npm run canary -- inspect\n  npm run canary -- publish [--output public/canary/devnet-manifest.json]\n  npm run canary -- awaken --ack-devnet-only\n  npm run canary -- release --ack-devnet-only\n  npm run canary -- roundtrip --ack-devnet-only\n  npm run canary -- soak --ack-devnet-only --cycles 100\n`)
+  process.stderr.write(`Usage:\n  npm run canary -- bootstrap --ack-devnet-only\n  npm run canary -- setup --ack-devnet-only [--token-mint ADDRESS]\n  npm run canary -- inspect\n  npm run canary -- publish [--output public/canary/devnet-manifest.json]\n  npm run canary -- allocate --ack-devnet-only --recipient PUBLIC_KEY\n  npm run canary -- awaken --ack-devnet-only\n  npm run canary -- release --ack-devnet-only\n  npm run canary -- roundtrip --ack-devnet-only\n  npm run canary -- soak --ack-devnet-only --cycles 100\n`)
 }

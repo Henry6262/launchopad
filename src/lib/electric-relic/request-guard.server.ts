@@ -209,6 +209,26 @@ export function getActivityRateLimitPolicy(): RateLimitPolicy {
   }
 }
 
+export function getCanaryStateRateLimitPolicy(): RateLimitPolicy {
+  return {
+    scope: "devnet-canary-state",
+    clientMax: 30,
+    windowMs: 60 * 1_000,
+    globalMax: 300,
+    globalWindowMs: 60 * 1_000,
+  }
+}
+
+export function getCanaryPrepareRateLimitPolicy(): RateLimitPolicy {
+  return {
+    scope: "devnet-canary-prepare",
+    clientMax: 6,
+    windowMs: 60 * 1_000,
+    globalMax: 30,
+    globalWindowMs: 60 * 1_000,
+  }
+}
+
 export function getPumpPreflightRateLimitPolicy(): RateLimitPolicy {
   const clientMax = readBoundedInteger(
     "ELECTRIC_RELIC_PUMP_PREFLIGHT_RATE_LIMIT_MAX",
@@ -280,12 +300,14 @@ export function clearPublicApiRateLimitsForTests() {
 }
 
 function fingerprintClient(request: Request) {
-  const source =
-    firstForwardedValue(request.headers.get("cf-connecting-ip")) ||
-    firstForwardedValue(request.headers.get("x-vercel-forwarded-for")) ||
-    firstForwardedValue(request.headers.get("x-real-ip")) ||
-    firstForwardedValue(request.headers.get("x-forwarded-for")) ||
-    FALLBACK_CLIENT
+  const source = process.env.VERCEL
+    ? firstForwardedValue(
+        request.headers.get("x-vercel-forwarded-for")
+      ) || FALLBACK_CLIENT
+    : firstForwardedValue(request.headers.get("cf-connecting-ip")) ||
+      firstForwardedValue(request.headers.get("x-real-ip")) ||
+      firstForwardedValue(request.headers.get("x-forwarded-for")) ||
+      FALLBACK_CLIENT
 
   return createHmac("sha256", fingerprintSecret)
     .update(source)

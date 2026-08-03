@@ -363,6 +363,13 @@
   font-size: 8px;
   font-weight: 850;
   letter-spacing: 0.12em;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.er2-hero__status:hover,
+.er2-hero__status:focus-visible {
+  color: var(--er-lime);
 }
 
 .er2-hero__status i,

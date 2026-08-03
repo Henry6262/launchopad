@@ -154,10 +154,11 @@ function Hero() {
           </Link>
         </div>
       </motion.div>
-      <div className="er2-hero__status">
+      <Link className="er2-hero__status" href="/world/devnet-canary">
         <i />
-        FOUNDING PREVIEW · APPLICATION PACKETS OPEN · SWAPS AFTER CANARY
-      </div>
+        DEVNET CANARY · 101 LOOPS PROVEN · VIEW PUBLIC PROOF
+        <ArrowUpRight size={12} />
+      </Link>
     </section>
   )
 }

@@ -5,7 +5,6 @@ import {
   Activity,
   ArrowLeft,
   ArrowRight,
-  Boxes,
   CheckCircle2,
   CircleAlert,
   Clock3,
@@ -17,10 +16,10 @@ import {
   Radio,
   RefreshCw,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import ProductMark from "./product-mark"
+import DevnetCanaryWalletLab from "./devnet-canary-wallet-lab"
 import styles from "./devnet-canary-console.module.css"
 
 const PUBLIC_MANIFEST_PATH = "/canary/devnet-manifest.json"
@@ -441,7 +440,7 @@ function LockRail() {
         <LockKeyhole size={13} /> MAINNET LOCKED
       </span>
       <span>
-        <ShieldCheck size={13} /> READ ONLY
+        <ShieldCheck size={13} /> PUBLIC PROOF
       </span>
     </aside>
   )
@@ -559,7 +558,7 @@ function ProofConsole({ proof }: { proof: CanaryProof }) {
         <div className={styles.summaryLead}>
           <div>
             <span>REVERSIBLE UNIT</span>
-            <strong>{backing} TEST TOKENS</strong>
+            <strong>{backing} TEST {backing === "1" ? "TOKEN" : "TOKENS"}</strong>
             <ArrowRight size={18} />
             <strong>1 CORE NFT</strong>
           </div>
@@ -671,40 +670,14 @@ function ProofConsole({ proof }: { proof: CanaryProof }) {
         )}
       </section>
 
-      <section className={styles.lockedActions}>
-        <div className={styles.lockedCopy}>
-          <span>04 / OPERATOR ACTIONS</span>
-          <h2>WALLET ACTIONS ARE NOT ENABLED.</h2>
-          <p>
-            This route cannot construct, sign, or broadcast transactions. Awaken, Release, and Evolve stay locked until the reviewed write client and recovery flow pass the canary gates.
-          </p>
-        </div>
-        <div className={styles.actionButtons} aria-label="Locked canary actions">
-          <button type="button" disabled>
-            <Sparkles size={16} /> AWAKEN LOCKED
-          </button>
-          <button type="button" disabled>
-            <Boxes size={16} /> RELEASE LOCKED
-          </button>
-          <button type="button" disabled>
-            <RefreshCw size={16} /> EVOLVE LOCKED
-          </button>
-        </div>
-        <div className={styles.mainnetLock}>
-          <LockKeyhole size={18} />
-          <div>
-            <strong>MAINNET REMAINS LOCKED</strong>
-            <span>A separate reviewed build and signed launch decision are required.</span>
-          </div>
-        </div>
-      </section>
+      <DevnetCanaryWalletLab />
 
       <footer className={styles.proofFooter}>
         <span>
           <Clock3 size={13} /> MANIFEST PUBLISHED {formatTime(proof.publishedAt)} UTC
         </span>
         <span>
-          <Radio size={13} /> PUBLIC EVIDENCE · NOT A LIVE WALLET CONSOLE
+          <Radio size={13} /> PUBLIC PROOF · ISOLATED DEVNET WALLET LAB
         </span>
       </footer>
     </div>

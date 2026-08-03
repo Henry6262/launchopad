@@ -1,0 +1,556 @@
+.lab {
+  position: relative;
+  display: grid;
+  gap: 22px;
+  overflow: hidden;
+  padding: clamp(26px, 4vw, 52px);
+  border: 1px solid rgba(184, 255, 44, 0.18);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(184, 255, 44, 0.1), transparent 25rem),
+    linear-gradient(140deg, rgba(184, 255, 44, 0.04), transparent 42%),
+    rgba(8, 12, 10, 0.92);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
+}
+
+.lab::before {
+  position: absolute;
+  top: 0;
+  right: 34px;
+  left: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lime), transparent);
+  content: "";
+  opacity: 0.56;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 32px;
+}
+
+.head > div:first-child > span,
+.stateGrid span,
+.gates span,
+.reviewTitle span,
+.foot,
+.walletControl small {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.head > div:first-child > span {
+  color: var(--lime);
+}
+
+.head h2 {
+  max-width: 800px;
+  margin: 15px 0 18px;
+  font-family: "Rebond", "Mona Sans", sans-serif;
+  font-size: clamp(30px, 4vw, 58px);
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+}
+
+.head p {
+  max-width: 790px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.walletControl {
+  display: grid;
+  min-width: 190px;
+  justify-items: end;
+  gap: 8px;
+}
+
+.walletControl :global(.wallet-adapter-button) {
+  min-height: 48px;
+  border: 1px solid rgba(184, 255, 44, 0.3);
+  border-radius: 15px;
+  background: var(--lime);
+  color: #081005;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.walletControl small {
+  color: var(--dim);
+}
+
+.gates {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 19px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.gates > div {
+  display: grid;
+  min-height: 88px;
+  grid-template-columns: auto 1fr;
+  align-content: center;
+  gap: 8px 10px;
+  padding: 17px;
+  border-right: 1px solid var(--line);
+}
+
+.gates > div:last-child {
+  border-right: 0;
+}
+
+.gates svg {
+  color: var(--lime);
+}
+
+.gates span {
+  color: var(--dim);
+}
+
+.gates strong {
+  grid-column: 1 / -1;
+  color: rgba(243, 245, 235, 0.88);
+  font-size: 12px;
+}
+
+.stateGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 12px;
+}
+
+.stateGrid > div {
+  display: grid;
+  min-height: 126px;
+  align-content: center;
+  gap: 8px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.022);
+}
+
+.stateGrid span {
+  color: var(--dim);
+}
+
+.stateGrid strong {
+  color: var(--chalk);
+  font-family: "Rebond", "Mona Sans", sans-serif;
+  font-size: clamp(24px, 2.4vw, 36px);
+  letter-spacing: -0.035em;
+}
+
+.stateGrid small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.relicState {
+  border-color: rgba(184, 255, 44, 0.18) !important;
+  background: rgba(184, 255, 44, 0.035) !important;
+}
+
+.relicState strong {
+  color: var(--lime);
+}
+
+.alert,
+.flow,
+.pendingBox {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 107, 95, 0.22);
+  border-radius: 16px;
+  background: rgba(255, 107, 95, 0.055);
+  color: #ffc0ba;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.flow {
+  border-color: rgba(244, 201, 93, 0.22);
+  background: rgba(244, 201, 93, 0.05);
+  color: #f4c95d;
+}
+
+.flow svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.flow strong {
+  flex: 1;
+}
+
+.flow a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: inherit;
+}
+
+.flowSuccess {
+  border-color: rgba(184, 255, 44, 0.22);
+  background: rgba(184, 255, 44, 0.05);
+  color: var(--lime);
+}
+
+.flowError {
+  border-color: rgba(255, 107, 95, 0.22);
+  background: rgba(255, 107, 95, 0.055);
+  color: #ffc0ba;
+}
+
+.pendingBox {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  border-color: rgba(244, 201, 93, 0.24);
+  background: rgba(244, 201, 93, 0.055);
+  color: #f4c95d;
+}
+
+.pendingBox > div {
+  display: grid;
+  gap: 3px;
+}
+
+.pendingBox span {
+  color: rgba(244, 201, 93, 0.68);
+}
+
+.pendingBox button,
+.foot button,
+.reviewActions button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.actionCard {
+  display: grid;
+  min-height: 196px;
+  align-content: start;
+  justify-items: start;
+  gap: 11px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.022);
+  color: var(--chalk);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.actionCard:not(:disabled):hover,
+.actionActive {
+  border-color: rgba(184, 255, 44, 0.4);
+  background: rgba(184, 255, 44, 0.055);
+  transform: translateY(-2px);
+}
+
+.actionCard:disabled {
+  color: rgba(243, 245, 235, 0.36);
+  cursor: not-allowed;
+}
+
+.actionIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid rgba(184, 255, 44, 0.2);
+  border-radius: 14px;
+  background: rgba(184, 255, 44, 0.06);
+  color: var(--lime);
+}
+
+.actionCard strong {
+  margin-top: 5px;
+  font-family: "Rebond", "Mona Sans", sans-serif;
+  font-size: 23px;
+  letter-spacing: -0.03em;
+}
+
+.actionCard b {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.07em;
+}
+
+.actionCard small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.review {
+  display: grid;
+  gap: 22px;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid rgba(184, 255, 44, 0.28);
+  border-radius: 23px;
+  background: rgba(184, 255, 44, 0.045);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.reviewTitle {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: var(--lime);
+}
+
+.reviewTitle > div {
+  display: grid;
+  gap: 4px;
+}
+
+.reviewTitle span {
+  color: var(--muted);
+}
+
+.reviewTitle h3 {
+  margin: 0;
+  font-family: "Rebond", "Mona Sans", sans-serif;
+  font-size: 21px;
+}
+
+.review ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+  color: rgba(243, 245, 235, 0.74);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.reviewAccounts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.reviewAccounts > div {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  padding: 14px 16px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.reviewAccounts > div:nth-child(2n) {
+  border-right: 0;
+}
+
+.reviewAccounts > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.reviewAccounts span {
+  color: var(--dim);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.reviewAccounts code {
+  overflow-wrap: anywhere;
+  color: rgba(243, 245, 235, 0.76);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.reviewActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.reviewActions .signButton {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: #081005;
+}
+
+.reviewActions button:disabled {
+  opacity: 0.36;
+  cursor: not-allowed;
+}
+
+.pendingBox button:disabled,
+.foot button:disabled {
+  opacity: 0.46;
+  cursor: wait;
+}
+
+.foot {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 4px;
+  color: var(--dim);
+}
+
+.foot span,
+.foot button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.foot button {
+  border-color: var(--line);
+}
+
+.spin {
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (max-width: 980px) {
+  .head {
+    grid-template-columns: 1fr;
+  }
+
+  .walletControl {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .gates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gates > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .gates > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stateGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .lab {
+    padding: 22px;
+    border-radius: 23px;
+  }
+
+  .gates,
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .gates > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .gates > div:last-child {
+    border-bottom: 0;
+  }
+
+  .pendingBox {
+    grid-template-columns: auto 1fr;
+  }
+
+  .pendingBox button {
+    grid-column: 1 / -1;
+  }
+
+  .reviewAccounts {
+    grid-template-columns: 1fr;
+  }
+
+  .reviewAccounts > div,
+  .reviewAccounts > div:nth-child(2n),
+  .reviewAccounts > div:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .reviewAccounts > div:last-child {
+    border-bottom: 0;
+  }
+
+  .flow,
+  .foot,
+  .reviewActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .flow a {
+    margin-top: 6px;
+  }
+
+  .flow strong,
+  .pendingBox span {
+    overflow-wrap: anywhere;
+  }
+
+  .foot button,
+  .reviewActions button {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actionCard,
+  .spin {
+    animation: none;
+    transition: none;
+  }
+}
