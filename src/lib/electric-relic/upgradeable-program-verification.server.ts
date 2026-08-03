@@ -119,6 +119,14 @@ export interface ParsedUpgradeableProgramDataAccount {
   accountByteLength: number
 }
 
+export interface ParsedUpgradeableProgramDataMetadataAccount {
+  address: string
+  owner: typeof BPF_UPGRADEABLE_LOADER_PROGRAM_ADDRESS
+  executable: false
+  lastUpgradeSlot: string
+  upgradeAuthorityAddress: string | null
+}
+
 export interface VerifiedUpgradeableProgramDeployment {
   loaderAddress: typeof BPF_UPGRADEABLE_LOADER_PROGRAM_ADDRESS
   programAddress: string
@@ -271,6 +279,74 @@ export function parseUpgradeableProgramDataAccount(
       "programDataAccount",
       "INVALID_INPUT",
       "ProgramData account snapshot could not be read safely."
+    )
+  }
+}
+
+/**
+ * Parses only the fixed 45-byte ProgramData metadata prefix returned by an RPC
+ * data slice. This is suitable for cheap read-only freshness checks: any
+ * loader-mediated program upgrade changes the recorded slot. It deliberately
+ * does not prove executable bytes; transaction preparation must still fetch
+ * and hash the complete ProgramData account.
+ */
+export function parseUpgradeableProgramDataMetadataAccount(
+  account: ReadonlySolanaAccountSnapshot
+): UpgradeableProgramVerificationResult<ParsedUpgradeableProgramDataMetadataAccount> {
+  try {
+    const common = validateAccountEnvelope(account, {
+      path: "programDataMetadataAccount",
+      executable: false,
+      exactDataLength: UPGRADEABLE_PROGRAMDATA_METADATA_LENGTH,
+    })
+    if (!common.ok) {
+      return common
+    }
+
+    const tag = readU32LittleEndian(account.data, 0)
+    if (tag !== PROGRAMDATA_STATE_TAG) {
+      return invalid(
+        "programDataMetadataAccount.data",
+        "INVALID_STATE_TAG",
+        `Expected upgradeable-loader ProgramData tag ${PROGRAMDATA_STATE_TAG}; received ${tag}.`
+      )
+    }
+
+    const optionTag = account.data[12]
+    if (optionTag !== 0 && optionTag !== 1) {
+      return invalid(
+        "programDataMetadataAccount.data",
+        "INVALID_OPTION_TAG",
+        `Upgrade-authority option tag must be 0 or 1; received ${optionTag}.`
+      )
+    }
+
+    let upgradeAuthorityAddress: string | null = null
+    if (optionTag === 1) {
+      upgradeAuthorityAddress = publicKeyFromBytes(
+        account.data.subarray(13, UPGRADEABLE_PROGRAMDATA_METADATA_LENGTH)
+      )
+      if (upgradeAuthorityAddress === null) {
+        return invalid(
+          "programDataMetadataAccount.data",
+          "INVALID_ADDRESS",
+          "ProgramData metadata contains an invalid upgrade-authority public key."
+        )
+      }
+    }
+
+    return valid({
+      address: common.value.address,
+      owner: BPF_UPGRADEABLE_LOADER_PROGRAM_ADDRESS,
+      executable: false,
+      lastUpgradeSlot: readU64LittleEndian(account.data, 4).toString(),
+      upgradeAuthorityAddress,
+    })
+  } catch {
+    return invalid(
+      "programDataMetadataAccount",
+      "INVALID_INPUT",
+      "ProgramData metadata snapshot could not be read safely."
     )
   }
 }

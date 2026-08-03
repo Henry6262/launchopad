@@ -38,13 +38,12 @@ import {
   decodeHybridV2RecipeAccount,
 } from "./hybrid-v2"
 import {
+  parseUpgradeableProgramAccount,
+  parseUpgradeableProgramDataMetadataAccount,
   verifyUpgradeableProgramDeployment,
-  verifyUpgradeableProgramDeploymentFromRpc,
   type ReadonlySolanaAccountSnapshot,
   type UpgradeableProgramExpectation,
 } from "./upgradeable-program-verification.server"
-
-const PROGRAM_VERIFICATION_TTL_MS = 5 * 60 * 1_000
 
 type JsonRecord = Record<string, unknown>
 
@@ -107,13 +106,6 @@ interface CanaryConfig {
   }
 }
 
-let cachedProgramVerification:
-  | {
-      expiresAt: number
-      result: Awaited<ReturnType<typeof verifyProgram>>
-    }
-  | undefined
-
 export async function readDevnetCanaryLiveState(
   requestedWallet: string | null,
   options: { freshProgramVerification?: boolean } = {}
@@ -174,18 +166,22 @@ export async function readDevnetCanaryLiveState(
       : []),
     ...(walletTokenAccount ? [walletTokenAccount] : []),
   ]
-  const [observation, cachedProgramVerification, walletBalance] = await Promise.all([
-    connection.getMultipleAccountsInfoAndContext(addresses, {
-      commitment: "finalized",
-      minContextSlot: Number(config.program.observedSlot),
-    }),
-    freshProgramVerification
-      ? Promise.resolve(null)
-      : readCachedProgramVerification(rpcUrl, config),
-    queriedTesterWallet
-      ? connection.getBalance(new PublicKey(queriedTesterWallet), "finalized")
-      : Promise.resolve(0),
-  ])
+  const [observation, programHeaderVerification, walletBalance] =
+    await Promise.all([
+      connection.getMultipleAccountsInfoAndContext(addresses, {
+        commitment: "finalized",
+        minContextSlot: Number(config.program.observedSlot),
+      }),
+      freshProgramVerification
+        ? Promise.resolve(null)
+        : readProgramHeaderVerification(connection, config),
+      queriedTesterWallet
+        ? connection.getBalance(
+            new PublicKey(queriedTesterWallet),
+            "finalized"
+          )
+        : Promise.resolve(0),
+    ])
 
   const [
     assetInfo,
@@ -224,7 +220,7 @@ export async function readDevnetCanaryLiveState(
         programInfo,
         programDataInfo
       )
-    : cachedProgramVerification
+    : programHeaderVerification
   if (!programVerification) {
     throw new Error("Canary program verification is unavailable")
   }
@@ -439,42 +435,50 @@ export async function readDevnetCanaryLiveState(
   }
 }
 
-async function readCachedProgramVerification(
-  rpcUrl: string,
+async function readProgramHeaderVerification(
+  connection: Connection,
   config: CanaryConfig
 ) {
-  const now = Date.now()
-  if (cachedProgramVerification?.expiresAt && cachedProgramVerification.expiresAt > now) {
-    return cachedProgramVerification.result
+  const programAddress = new PublicKey(config.program.address)
+  const programDataAddress = new PublicKey(
+    config.program.programDataAddress
+  )
+  const observation =
+    await connection.getMultipleAccountsInfoAndContext(
+      [programAddress, programDataAddress],
+      {
+        commitment: "finalized",
+        minContextSlot: Number(config.program.observedSlot),
+        dataSlice: { offset: 0, length: 45 },
+      }
+    )
+  const [programInfo, programDataInfo] = observation.value
+  if (
+    observation.context.slot < Number(config.program.observedSlot) ||
+    !programInfo ||
+    !programDataInfo
+  ) {
+    return { ok: false }
   }
-  const result = await verifyProgram(rpcUrl, config)
-  cachedProgramVerification = {
-    expiresAt: now + PROGRAM_VERIFICATION_TTL_MS,
-    result,
-  }
-  return result
-}
 
-function verifyProgram(rpcUrl: string, config: CanaryConfig) {
-  const expectation: UpgradeableProgramExpectation = {
-    programAddress: config.program.address,
-    programDataAddress: config.program.programDataAddress,
-    executableSha256: config.program.executableSha256,
-    upgradeAuthority: {
-      kind: "EXACT",
-      address: config.program.upgradeAuthority,
-    },
-  }
-  return verifyUpgradeableProgramDeploymentFromRpc(
-    rpcUrl,
-    expectation,
-    config.program.observedSlot
-  ).then((result) => ({
+  const program = parseUpgradeableProgramAccount(
+    toReadonlyProgramSnapshot(programAddress, programInfo)
+  )
+  const programData = parseUpgradeableProgramDataMetadataAccount(
+    toReadonlyProgramSnapshot(programDataAddress, programDataInfo)
+  )
+  return {
     ok:
-      result.ok &&
-      result.value.lastUpgradeSlot === config.program.deployedSlot &&
-      result.value.programByteLength === config.program.executableBytes,
-  }))
+      program.ok &&
+      programData.ok &&
+      program.value.address === config.program.address &&
+      program.value.programDataAddress ===
+        config.program.programDataAddress &&
+      programData.value.address === config.program.programDataAddress &&
+      programData.value.lastUpgradeSlot === config.program.deployedSlot &&
+      programData.value.upgradeAuthorityAddress ===
+        config.program.upgradeAuthority,
+  }
 }
 
 function verifyProgramFromSameContext(

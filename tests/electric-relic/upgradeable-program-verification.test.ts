@@ -9,6 +9,7 @@ import {
   UPGRADEABLE_PROGRAM_ACCOUNT_DATA_LENGTH,
   parseUpgradeableProgramAccount,
   parseUpgradeableProgramDataAccount,
+  parseUpgradeableProgramDataMetadataAccount,
   verifyUpgradeableProgramDeployment,
   verifyUpgradeableProgramDeploymentFromRpc,
   type ReadonlySolanaAccountSnapshot,
@@ -167,6 +168,51 @@ test("parses canonical loader layouts and hashes every payload byte", () => {
     )
     assert.equal(parsedProgramData.value.programByteLength, 12)
   }
+})
+
+test("parses a sliced ProgramData metadata header for lightweight freshness checks", () => {
+  const authorityAddress = address(13)
+  const fixture = deploymentFixture({
+    slot: 404_350_747n,
+    authorityAddress,
+  })
+  const metadata = parseUpgradeableProgramDataMetadataAccount({
+    ...fixture.programDataAccount,
+    data: fixture.programDataAccount.data.slice(
+      0,
+      UPGRADEABLE_PROGRAMDATA_METADATA_LENGTH
+    ),
+  })
+
+  assert.equal(metadata.ok, true)
+  if (metadata.ok) {
+    assert.equal(metadata.value.lastUpgradeSlot, "404350747")
+    assert.equal(metadata.value.upgradeAuthorityAddress, authorityAddress)
+  }
+
+  assertIssue(
+    parseUpgradeableProgramDataMetadataAccount({
+      ...fixture.programDataAccount,
+      data: fixture.programDataAccount.data.slice(
+        0,
+        UPGRADEABLE_PROGRAMDATA_METADATA_LENGTH - 1
+      ),
+    }),
+    "INVALID_DATA_LENGTH"
+  )
+
+  const malformedOption = fixture.programDataAccount.data.slice(
+    0,
+    UPGRADEABLE_PROGRAMDATA_METADATA_LENGTH
+  )
+  malformedOption[12] = 2
+  assertIssue(
+    parseUpgradeableProgramDataMetadataAccount({
+      ...fixture.programDataAccount,
+      data: malformedOption,
+    }),
+    "INVALID_OPTION_TAG"
+  )
 })
 
 test("rejects wrong owners and executable flags", () => {
@@ -405,6 +451,9 @@ test("public parsers and verifier do not throw on hostile snapshots", () => {
   assert.doesNotThrow(() => parseUpgradeableProgramAccount(hostile))
   assert.doesNotThrow(() => parseUpgradeableProgramDataAccount(hostile))
   assert.doesNotThrow(() =>
+    parseUpgradeableProgramDataMetadataAccount(hostile)
+  )
+  assert.doesNotThrow(() =>
     verifyUpgradeableProgramDeployment(
       hostile,
       fixture.programDataAccount,
@@ -556,6 +605,12 @@ function assertIssue(
   code: string
 ): void
 function assertIssue(
+  result: ReturnType<
+    typeof parseUpgradeableProgramDataMetadataAccount
+  >,
+  code: string
+): void
+function assertIssue(
   result: ReturnType<typeof verifyUpgradeableProgramDeployment>,
   code: string
 ): void
@@ -563,6 +618,7 @@ function assertIssue(
   result:
     | ReturnType<typeof parseUpgradeableProgramAccount>
     | ReturnType<typeof parseUpgradeableProgramDataAccount>
+    | ReturnType<typeof parseUpgradeableProgramDataMetadataAccount>
     | ReturnType<typeof verifyUpgradeableProgramDeployment>,
   code: string
 ): void {
