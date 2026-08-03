@@ -740,6 +740,7 @@
 .heroRail b { margin-left: auto; color: rgba(244, 245, 236, 0.72); }
 
 .standardSection,
+.crossChainSection,
 .rewardsSection,
 .worldsSection {
   position: relative;
@@ -753,6 +754,7 @@
 }
 
 .standardSection::before,
+.crossChainSection::before,
 .rewardsSection::before,
 .worldsSection::before {
   position: absolute;
@@ -972,6 +974,271 @@
 
 .standardFoot span { display: inline-flex; align-items: center; gap: 7px; }
 .standardFoot svg { color: var(--lime); }
+
+.crossChainSection {
+  display: grid;
+  grid-template-columns: minmax(290px, .72fr) minmax(0, 1.28fr);
+  align-items: center;
+  gap: clamp(38px, 6vw, 88px);
+  padding: 140px 0;
+}
+
+.crossChainCopy h2 {
+  margin: 22px 0 0;
+  color: var(--chalk);
+  font-family: "Rebond", sans-serif;
+  font-size: clamp(58px, 6.7vw, 102px);
+  font-weight: 900;
+  line-height: .84;
+  letter-spacing: -.072em;
+}
+
+.crossChainCopy h2 span { color: var(--lime); }
+
+.crossChainCopy > p {
+  max-width: 470px;
+  margin: 25px 0 0;
+  color: var(--muted);
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.7;
+  letter-spacing: .06em;
+}
+
+.crossChainActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.crossChainActions button,
+.crossChainActions a {
+  display: inline-flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 18px;
+  border-radius: 17px;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .06em;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.crossChainActions button {
+  border: 1px solid var(--lime);
+  background: var(--lime);
+  color: #070a08;
+  cursor: pointer;
+}
+
+.crossChainActions button:disabled { cursor: wait; opacity: .72; }
+.crossChainActions button:hover:not(:disabled),
+.crossChainActions a:hover { transform: translateY(-2px); }
+
+.crossChainActions a {
+  border: 1px solid var(--line-strong);
+  color: var(--chalk);
+}
+
+.crossChainActions a:hover {
+  border-color: rgba(183, 255, 50, .35);
+  background: var(--lime-soft);
+}
+
+.crossChainWalletState {
+  display: block;
+  margin-top: 13px;
+  color: rgba(244, 245, 236, .38);
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.crossChainRoute {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 50% 47%, rgba(183, 255, 50, .075), transparent 32%),
+    linear-gradient(145deg, rgba(255, 255, 255, .028), transparent 42%),
+    #080c09;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .045), 0 30px 90px rgba(0, 0, 0, .3);
+}
+
+.crossChainRoute::before {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .018) 1px, transparent 1px);
+  background-size: 36px 36px;
+  content: "";
+  mask-image: radial-gradient(circle at center, black, transparent 82%);
+  pointer-events: none;
+}
+
+.crossChainTopline {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  color: rgba(244, 245, 236, .42);
+  font-family: monospace;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+
+.crossChainTopline span { display: inline-flex; align-items: center; gap: 8px; }
+.crossChainTopline i { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 11px var(--lime); }
+.crossChainTopline b { color: var(--lime); }
+
+.chainRouteMap {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 300px;
+  grid-template-columns: minmax(78px, 1fr) minmax(38px, .55fr) minmax(92px, 1.08fr) minmax(38px, .55fr) minmax(78px, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.chainNode {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 1px solid rgba(244, 245, 236, .12);
+  border-radius: 32%;
+  background: rgba(5, 8, 6, .86);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .04), 0 16px 45px rgba(0, 0, 0, .28);
+  text-align: center;
+}
+
+.chainNode small,
+.chainNode span {
+  color: rgba(244, 245, 236, .34);
+  font-family: monospace;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+
+.chainNode strong {
+  color: var(--chalk);
+  font-family: "Rebond", sans-serif;
+  font-size: clamp(22px, 2.6vw, 36px);
+  line-height: .9;
+  letter-spacing: -.06em;
+}
+
+.chainNodeNeura {
+  border-color: rgba(183, 255, 50, .37);
+  background: radial-gradient(circle, rgba(183, 255, 50, .14), transparent 70%), #080c09;
+  box-shadow: inset 0 0 42px rgba(183, 255, 50, .045), 0 0 55px rgba(183, 255, 50, .09);
+}
+
+.chainNodeNeura strong,
+.chainNodeNeura span { color: var(--lime); }
+
+.chainNodeSepolia {
+  border-color: rgba(75, 119, 255, .22);
+  background: radial-gradient(circle, rgba(75, 119, 255, .1), transparent 70%), #080a0d;
+}
+
+.chainLane {
+  position: relative;
+  height: 1px;
+  background: rgba(244, 245, 236, .12);
+}
+
+.chainLane span {
+  position: absolute;
+  right: 0;
+  bottom: 11px;
+  left: 0;
+  color: rgba(244, 245, 236, .3);
+  font-family: monospace;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.chainLane i {
+  position: absolute;
+  top: -3px;
+  left: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lime);
+  box-shadow: 0 0 10px var(--lime);
+  animation: chainTravel 3.2s ease-in-out infinite;
+}
+
+.chainLanePending { background: repeating-linear-gradient(90deg, rgba(244, 245, 236, .12) 0 5px, transparent 5px 10px); }
+.chainLanePending i { display: none; }
+.chainLaneLive { background: linear-gradient(90deg, rgba(183, 255, 50, .12), rgba(183, 255, 50, .52)); }
+.chainLaneLive span { color: var(--lime); }
+
+.crossChainRoute > p {
+  position: relative;
+  z-index: 1;
+  max-width: 670px;
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, .18);
+  color: rgba(244, 245, 236, .5);
+  font-family: monospace;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.crossChainRoute > p b { color: var(--lime); }
+
+.crossChainFacts {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.crossChainFacts span,
+.crossChainFacts a {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  color: rgba(244, 245, 236, .38);
+  font-family: monospace;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.crossChainFacts a { color: var(--lime); }
 
 .rewardsSection {
   padding: 140px 0;
@@ -1401,6 +1668,7 @@
 @keyframes makerScan { 0%,100% { transform: translateX(-125px); opacity: .12; } 50% { transform: translateX(125px); opacity: .5; } }
 @keyframes stackEnergy { 0% { left: -3px; opacity: 0; } 12%, 82% { opacity: 1; } 100% { left: calc(100% - 4px); opacity: 0; } }
 @keyframes stackPulse { 0%, 100% { opacity: .18; transform: scale(.82); } 50% { opacity: .62; transform: scale(1.18); } }
+@keyframes chainTravel { 0% { left: -2px; opacity: 0; } 12%, 82% { opacity: 1; } 100% { left: calc(100% - 5px); opacity: 0; } }
 
 @media (max-width: 1120px) {
   .heroShell { width: min(960px,calc(100% - 48px)); grid-template-columns: .82fr 1.18fr; gap: 28px; }
@@ -1408,7 +1676,7 @@
   .heroMachine { min-height: 320px; grid-template-columns: minmax(90px,1fr) 42px 92px 42px minmax(90px,1fr); }
   .machineCore { width: 92px; }
   .tokenGlyph,.nftGlyph { width: 104px; }
-  .standardSection,.rewardsSection,.worldsSection,.footer { width: min(920px,calc(100% - 48px)); }
+  .standardSection,.crossChainSection,.rewardsSection,.worldsSection,.footer { width: min(920px,calc(100% - 48px)); }
   .standardLayout { gap: 34px; }
   .stageSequence { grid-template-columns: minmax(84px,1fr) 34px 74px 34px minmax(84px,1fr); }
   .stageCore { width: 70px; border-radius: 24px; }
@@ -1439,8 +1707,9 @@
   .tokenGlyph,.nftGlyph { width: 122px; }
   .heroRail { position: relative; right: auto; bottom: auto; left: auto; width: calc(100% - 36px); flex-wrap: wrap; margin: 52px auto 0; }
   .heroRail b { width: 100%; margin-left: 0; }
-  .standardSection,.rewardsSection,.worldsSection,.footer { width: min(720px,calc(100% - 36px)); }
-  .standardSection,.rewardsSection,.worldsSection { padding-top: 110px; }
+  .standardSection,.crossChainSection,.rewardsSection,.worldsSection,.footer { width: min(720px,calc(100% - 36px)); }
+  .standardSection,.crossChainSection,.rewardsSection,.worldsSection { padding-top: 110px; }
+  .crossChainSection { grid-template-columns: 1fr; gap: 44px; }
   .standardStackCard { min-height: auto; border-radius: 32px; }
   .stackCardBody { grid-template-columns: 1fr; gap: 12px; padding: 28px 0 20px; }
   .stackCardCopy { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 8px 20px; }
@@ -1489,8 +1758,18 @@
   .machineControls button span { display: none; }
   .heroRail { width: calc(100% - 28px); gap: 9px 15px; margin-top: 38px; }
   .heroRail span { font-size: 8px; }
-  .standardSection,.rewardsSection,.worldsSection,.footer { width: calc(100% - 28px); }
-  .standardSection,.rewardsSection,.worldsSection { padding-top: 88px; padding-bottom: 70px; }
+  .standardSection,.crossChainSection,.rewardsSection,.worldsSection,.footer { width: calc(100% - 28px); }
+  .standardSection,.crossChainSection,.rewardsSection,.worldsSection { padding-top: 88px; padding-bottom: 70px; }
+  .crossChainCopy h2 { font-size: clamp(52px, 15vw, 74px); }
+  .crossChainActions { display: grid; }
+  .crossChainActions button,.crossChainActions a { width: 100%; }
+  .crossChainRoute { padding: 15px; border-radius: 27px; }
+  .chainRouteMap { min-height: 230px; grid-template-columns: minmax(62px,1fr) 24px minmax(68px,1.06fr) 24px minmax(62px,1fr); gap: 4px; }
+  .chainNode { gap: 3px; border-radius: 24px; }
+  .chainNode strong { font-size: clamp(19px, 6vw, 27px); }
+  .chainNode small,.chainNode span { font-size: 5px; }
+  .chainLane span { bottom: 9px; font-size: 4px; }
+  .crossChainRoute > p { padding: 13px; font-size: 8px; }
   .sectionIntro,.rewardsIntro,.worldsIntro { gap: 13px; margin-bottom: 34px; }
   .sectionIntro h2,.rewardsIntro h2,.worldsIntro h2,.creatorCopy h2 { font-size: clamp(52px,15vw,74px); }
   .standardStackCard { padding: 17px; border-radius: 25px; }

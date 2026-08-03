@@ -49,6 +49,22 @@ const RelicDomeGallery = dynamic(() => import("@/components/react-bits/relic-dom
 
 type StandardMode = "awaken" | "release" | "evolve"
 type AssetKind = "token" | "nft"
+type NeuraWalletState = "IDLE" | "ADDING" | "READY" | "ERROR"
+
+type EvmWalletProvider = {
+  request: (input: { method: string; params?: unknown[] }) => Promise<unknown>
+}
+
+const NEURA_TESTNET = {
+  chainId: "0x10b",
+  chainName: "Neura Testnet",
+  nativeCurrency: { name: "ANKR", symbol: "ANKR", decimals: 18 },
+  rpcUrls: ["https://testnet.rpc.neuraprotocol.io/"],
+  blockExplorerUrls: ["https://testnet-blockscout.infra.neuraprotocol.io/"],
+} as const
+
+const NEURA_PORTAL = "https://neuraverse.neuraprotocol.io/?section=bridge"
+const NEURA_EXPLORER = "https://testnet-blockscout.infra.neuraprotocol.io/"
 
 type StandardMove = {
   id: StandardMode
@@ -141,6 +157,7 @@ function Header() {
 
         <nav className={styles.desktopNav} aria-label="Primary navigation">
           <a href="#standard">212 STANDARD</a>
+          <a href="#cross-chain">CROSS-CHAIN</a>
           <a href="#rewards">REWARDS</a>
           <a href="#worlds">WORLDS</a>
         </nav>
@@ -167,6 +184,7 @@ function Header() {
           <nav className={styles.mobileNav} aria-label="Mobile navigation">
             {[
               ["#standard", "212 STANDARD"],
+              ["#cross-chain", "CROSS-CHAIN"],
               ["#rewards", "REWARDS"],
               ["#worlds", "WORLDS"],
             ].map(([href, label]) => (
@@ -344,6 +362,112 @@ function Standard() {
         <span><Wallet size={14} /> EVERY MOVE IS SIGNED</span>
         <span>NO BURN · NO GUARANTEED RARITY</span>
       </div>
+    </section>
+  )
+}
+
+function CrossChainLab() {
+  const [walletState, setWalletState] = useState<NeuraWalletState>("IDLE")
+  const [walletMessage, setWalletMessage] = useState("EVM WALLET REQUIRED")
+  const reduceMotion = useReducedMotion()
+
+  const addNeura = async () => {
+    const provider = (window as Window & { ethereum?: EvmWalletProvider }).ethereum
+    if (!provider) {
+      setWalletState("ERROR")
+      setWalletMessage("NO EVM WALLET FOUND")
+      return
+    }
+
+    setWalletState("ADDING")
+    setWalletMessage("CHECK YOUR WALLET")
+    try {
+      await provider.request({
+        method: "wallet_addEthereumChain",
+        params: [NEURA_TESTNET],
+      })
+      await provider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: NEURA_TESTNET.chainId }],
+      })
+      setWalletState("READY")
+      setWalletMessage("CHAIN 267 CONNECTED")
+    } catch {
+      setWalletState("ERROR")
+      setWalletMessage("WALLET REQUEST CANCELLED")
+    }
+  }
+
+  const walletLabel =
+    walletState === "ADDING"
+      ? "OPENING WALLET…"
+      : walletState === "READY"
+        ? "NEURA READY"
+        : walletState === "ERROR"
+          ? "TRY AGAIN"
+          : "ADD NEURA"
+
+  return (
+    <section className={styles.crossChainSection} id="cross-chain">
+      <motion.div
+        className={styles.crossChainCopy}
+        initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: reduceMotion ? 0 : 0.58, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <span className={styles.eyebrow}>CROSS-CHAIN LAB // TESTNET</span>
+        <h2>CROSS THE TESTNET.<br /><span>NEURA 267.</span></h2>
+        <p>Add Neura Testnet to your EVM wallet, then enter its official bridge.</p>
+        <div className={styles.crossChainActions}>
+          <button type="button" onClick={() => void addNeura()} disabled={walletState === "ADDING"}>
+            {walletState === "READY" ? <Check size={17} /> : <Wallet size={17} />}
+            {walletLabel}
+          </button>
+          <a href={NEURA_PORTAL} target="_blank" rel="noreferrer">
+            OPEN NEURAVERSE <ArrowUpRight size={17} />
+          </a>
+        </div>
+        <span className={styles.crossChainWalletState} aria-live="polite">{walletMessage}</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.crossChainRoute}
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: reduceMotion ? 0 : 0.62, delay: reduceMotion ? 0 : 0.08 }}
+      >
+        <div className={styles.crossChainTopline}>
+          <span><i /> ROUTE MAP</span>
+          <b>TESTNET ONLY</b>
+        </div>
+        <div className={styles.chainRouteMap} aria-label="Solana roadmap to Neura Testnet and the live Neura to Sepolia test bridge">
+          <div className={styles.chainNode}>
+            <small>212 HOME</small>
+            <strong>SOLANA</strong>
+            <span>ROADMAP</span>
+          </div>
+          <div className={`${styles.chainLane} ${styles.chainLanePending}`}><span>NEXT</span><i /></div>
+          <div className={`${styles.chainNode} ${styles.chainNodeNeura}`}>
+            <small>CHAIN ID</small>
+            <strong>267</strong>
+            <span>NEURA</span>
+          </div>
+          <div className={`${styles.chainLane} ${styles.chainLaneLive}`}><span>LIVE TEST</span><i /></div>
+          <div className={`${styles.chainNode} ${styles.chainNodeSepolia}`}>
+            <small>ETH TEST</small>
+            <strong>SEP</strong>
+            <span>SEPOLIA</span>
+          </div>
+        </div>
+        <p><b>LIVE:</b> tANKR moves between Neura Testnet and Ethereum Sepolia. Direct Solana ↔ Neura transport is not live yet.</p>
+        <div className={styles.crossChainFacts}>
+          <span>CHAIN 267</span>
+          <span>ANKR GAS</span>
+          <a href={NEURA_EXPLORER} target="_blank" rel="noreferrer">EXPLORER <ArrowUpRight size={13} /></a>
+        </div>
+      </motion.div>
     </section>
   )
 }
@@ -633,11 +757,12 @@ function Footer() {
       <p>ONE TOKEN. TWO FORMS.<br /><b>WELCOME TO THE REAL WORLD.</b></p>
       <nav aria-label="Footer navigation">
         <a href="#standard">212</a>
+        <a href="#cross-chain">CROSS-CHAIN</a>
         <a href="#rewards">REWARDS</a>
         <Link href="/pump">CHECK</Link>
         <Link href="/create">LAUNCH</Link>
       </nav>
-      <small>FOUNDING PREVIEW · MAINNET SWAPS LOCKED</small>
+      <small>FOUNDING PREVIEW · MAINNET SWAPS + SOLANA CROSS-CHAIN LOCKED</small>
     </footer>
   )
 }
@@ -648,6 +773,7 @@ export default function ElectricRelicSite() {
       <Header />
       <Hero />
       <Standard />
+      <CrossChainLab />
       <Rewards />
       <Worlds />
       <Footer />
