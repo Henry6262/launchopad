@@ -1,0 +1,39 @@
+.stack {
+  position: relative;
+  padding-bottom: 12vh;
+  isolation: isolate;
+}
+
+.layer {
+  position: sticky;
+  z-index: calc(10 + var(--stack-index));
+  top: calc(104px + var(--stack-index) * 18px);
+  min-height: 66vh;
+  margin-bottom: 20vh;
+  transform-origin: top center;
+}
+
+.layer:last-child { margin-bottom: 0; }
+
+.motionCard {
+  height: 100%;
+  min-height: 66vh;
+  transform-origin: top center;
+  will-change: transform, opacity;
+}
+
+@media (max-width: 860px) {
+  .stack { display: grid; gap: 18px; padding-bottom: 0; }
+  .layer {
+    position: relative;
+    top: auto;
+    min-height: auto;
+    margin: 0;
+  }
+  .motionCard { min-height: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer { position: relative; top: auto; min-height: auto; margin-bottom: 18px; }
+  .motionCard { min-height: auto; transform: none !important; opacity: 1 !important; }
+}

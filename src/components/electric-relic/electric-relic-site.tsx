@@ -27,8 +27,9 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion"
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
+import { useMemo, useRef, useState, type ReactNode } from "react"
 import ProductMark from "@/components/electric-relic/product-mark"
+import ScrollStack from "@/components/react-bits/scroll-stack"
 import SpotlightCard from "@/components/react-bits/spotlight-card"
 import styles from "./electric-relic-landing.module.css"
 
@@ -38,6 +39,11 @@ const LightRays = dynamic(() => import("@/components/react-bits/light-rays"), {
 
 const CenterFlow = dynamic(() => import("@/components/react-bits/center-flow"), {
   ssr: false,
+})
+
+const RelicDomeGallery = dynamic(() => import("@/components/react-bits/relic-dome-gallery"), {
+  ssr: false,
+  loading: () => <div className={styles.domeLoading}><b>212</b><span>OPENING THE WORLD</span></div>,
 })
 
 type StandardMode = "awaken" | "release" | "evolve"
@@ -104,6 +110,11 @@ const standardMoves: StandardMove[] = [
     line: "Release, then Awaken again. No rarity promise.",
   },
 ]
+
+const domeImages = Array.from({ length: 9 }, (_, index) => ({
+  src: `/images/electric-relic/relics/relic-${String(index + 1).padStart(2, "0")}.webp`,
+  alt: `Relic form ${String(index + 1).padStart(2, "0")}`,
+}))
 
 function XBrandIcon({ size = 16 }: { size?: number }) {
   return (
@@ -199,62 +210,14 @@ function AssetNode({
   )
 }
 
-function HeroMachine() {
-  const [mode, setMode] = useState<StandardMode>("awaken")
-  const [run, setRun] = useState(0)
-  const active = standardMoves.find((move) => move.id === mode) ?? standardMoves[0]
-
-  const replay = (next: StandardMode) => {
-    setMode(next)
-    setRun((value) => value + 1)
-  }
-
+function HeroWorld() {
   return (
-    <div className={styles.heroMachineWrap}>
-      <div className={styles.machineTopline}>
-        <span><i /> 212 ENGINE</span>
-        <b>{active.title}</b>
+    <div className={styles.heroWorld}>
+      <div className={styles.heroWorldTopline}>
+        <span><i /> WORLD ENGINE ONLINE</span>
+        <b>30 LIVE FORMS</b>
       </div>
-
-      <div
-        className={`${styles.heroMachine} ${styles[mode]}`}
-        aria-label={`${active.title}: ${active.equation}`}
-      >
-        <AssetNode kind={active.inputKind} label={active.input} image={active.inputImage} />
-
-        <div className={styles.machineLane} aria-hidden="true">
-          <span />
-          <i key={`left-${run}`} />
-        </div>
-
-        <div className={styles.machineCore} aria-hidden="true">
-          <span className={styles.coreRingOne} />
-          <span className={styles.coreRingTwo} />
-          <i key={`core-${run}`} />
-          <b>212</b>
-          <small>STANDARD</small>
-        </div>
-
-        <div className={styles.machineLane} aria-hidden="true">
-          <span />
-          <i key={`right-${run}`} />
-        </div>
-
-        <AssetNode kind={active.outputKind} label={active.output} image={active.outputImage} />
-      </div>
-
-      <div className={styles.machineControls} role="group" aria-label="Preview a 212 action">
-        {standardMoves.map((move) => (
-          <button
-            key={move.id}
-            type="button"
-            aria-pressed={mode === move.id}
-            onClick={() => replay(move.id)}
-          >
-            <span>{move.index}</span>{move.title}
-          </button>
-        ))}
-      </div>
+      <RelicDomeGallery images={domeImages} />
     </div>
   )
 }
@@ -266,9 +229,8 @@ function Hero() {
     target: heroRef,
     offset: ["start start", "end start"],
   })
-  const machineY = useTransform(scrollYProgress, [0, 1], [0, -16])
-  const machineScale = useTransform(scrollYProgress, [0, 1], [1, 1.035])
-  const copyY = useTransform(scrollYProgress, [0, 1], [0, -10])
+  const machineY = useTransform(scrollYProgress, [0, 1], [0, 24])
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, -24])
 
   return (
     <section className={styles.hero} id="top" ref={heroRef}>
@@ -287,7 +249,13 @@ function Hero() {
       )}
 
       <div className={styles.heroShell}>
-        <motion.div className={styles.heroCopy} style={reduceMotion ? undefined : { y: copyY }}>
+        <motion.div
+          className={styles.heroCopy}
+          style={reduceMotion ? undefined : { y: copyY }}
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduceMotion ? 0 : 0.48, ease: [0.22, 1, 0.36, 1] }}
+        >
           <span className={styles.eyebrow}><i /> RELIC.FUN // HOME OF 212</span>
           <h1>ONE TOKEN.<br /><span>TWO FORMS.</span></h1>
           <p>TOKEN ⇄ NFT. THAT&apos;S THE 212 STANDARD.</p>
@@ -299,14 +267,16 @@ function Hero() {
               SEE THE LOOP <ArrowRight size={18} />
             </a>
           </div>
-          <span className={styles.eligibilityNote}>CLASSIC SPL V1 · TOKEN-2022 IN DEVELOPMENT</span>
         </motion.div>
 
         <motion.div
           className={styles.heroMachineColumn}
-          style={reduceMotion ? undefined : { y: machineY, scale: machineScale }}
+          style={reduceMotion ? undefined : { y: machineY }}
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: reduceMotion ? 0 : 0.64, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <HeroMachine />
+          <HeroWorld />
         </motion.div>
       </div>
 
@@ -320,116 +290,53 @@ function Hero() {
   )
 }
 
-function StandardStage({ move }: { move: StandardMove }) {
-  const reduceMotion = useReducedMotion()
-
+function StandardStackCard({ move }: { move: StandardMove }) {
   return (
-    <div className={styles.standardStage} aria-live="polite">
-      <div className={styles.stageTopline}>
+    <article className={`${styles.standardStackCard} ${styles[`standardCard${move.index}`]}`}>
+      <header className={styles.stackCardHeader}>
         <span>212 / {move.index}</span>
-        <b>{move.title}</b>
-      </div>
+        <b>{move.fee} · {move.approvals}</b>
+      </header>
 
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={move.id}
-          className={`${styles.stageSequence} ${styles[move.id]}`}
-          initial={reduceMotion ? false : { opacity: 0, scale: 0.985 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={reduceMotion ? undefined : { opacity: 0, scale: 1.01 }}
-          transition={{ duration: reduceMotion ? 0 : 0.34, ease: "easeOut" }}
-        >
+      <div className={styles.stackCardBody}>
+        <div className={styles.stackCardCopy}>
+          <small>{move.equation}</small>
+          <h3>{move.title}</h3>
+          <p>{move.line}</p>
+        </div>
+
+        <div className={`${styles.stackSequence} ${styles[move.id]}`} aria-label={`${move.title}: ${move.equation}`}>
           <AssetNode compact kind={move.inputKind} label={move.input} image={move.inputImage} />
-          <div className={styles.stageRail} aria-hidden="true"><i /><span /></div>
-          <div className={styles.stageCore} aria-hidden="true"><b>212</b><i /></div>
-          <div className={styles.stageRail} aria-hidden="true"><i /><span /></div>
+          <div className={styles.stackRail} aria-hidden="true"><span /><i /></div>
+          <div className={styles.stackCore} aria-hidden="true"><b>212</b><i /></div>
+          <div className={styles.stackRail} aria-hidden="true"><span /><i /></div>
           <AssetNode compact kind={move.outputKind} label={move.output} image={move.outputImage} />
-        </motion.div>
-      </AnimatePresence>
-
-      <div className={styles.stageReceipt}>
-        <strong>{move.line}</strong>
-        <span>{move.fee}</span>
-        <span>{move.approvals}</span>
+        </div>
       </div>
-    </div>
+
+      <footer><span>INPUT</span><i /><span>212 VAULT</span><i /><span>OUTPUT</span></footer>
+    </article>
   )
 }
 
 function Standard() {
-  const [activeIndex, setActiveIndex] = useState(0)
-  const stepRefs = useRef<Array<HTMLButtonElement | null>>([])
-  const reduceMotion = useReducedMotion()
-
-  useEffect(() => {
-    const steps = stepRefs.current.filter((step): step is HTMLButtonElement => Boolean(step))
-    if (!steps.length || !("IntersectionObserver" in window)) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const current = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-        if (current) setActiveIndex(Number((current.target as HTMLElement).dataset.standardStep ?? 0))
-      },
-      { rootMargin: "-30% 0px -48%", threshold: [0.2, 0.45, 0.7] },
-    )
-
-    steps.forEach((step) => observer.observe(step))
-    return () => observer.disconnect()
-  }, [])
-
-  const selectStep = (index: number) => {
-    setActiveIndex(index)
-    stepRefs.current[index]?.scrollIntoView({
-      behavior: reduceMotion ? "auto" : "smooth",
-      block: "center",
-    })
-  }
-
   return (
     <section className={styles.standardSection} id="standard">
-      <div className={styles.sectionIntro}>
+      <motion.div
+        className={styles.sectionIntro}
+        initial={{ opacity: 0, y: 22 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
+      >
         <span className={styles.eyebrow}>THE 212 STANDARD</span>
-        <h2>TOKEN. NFT.<br /><span>BACK AGAIN.</span></h2>
-        <p>One vault. Three moves.</p>
-      </div>
+        <h2>THREE MOVES.<br /><span>ONE VAULT.</span></h2>
+        <p>Scroll the loop.</p>
+      </motion.div>
 
-      <div className={styles.standardLayout}>
-        <div className={styles.standardSticky}>
-          <StandardStage move={standardMoves[activeIndex]} />
-          <div className={styles.standardTabs} role="tablist" aria-label="212 actions">
-            {standardMoves.map((move, index) => (
-              <button
-                key={move.id}
-                type="button"
-                role="tab"
-                aria-selected={activeIndex === index}
-                onClick={() => selectStep(index)}
-              >
-                {move.index} / {move.title}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className={styles.standardSteps}>
-          {standardMoves.map((move, index) => (
-            <button
-              key={move.id}
-              ref={(node) => { stepRefs.current[index] = node }}
-              type="button"
-              data-standard-step={index}
-              className={activeIndex === index ? styles.activeStandardStep : ""}
-              onClick={() => selectStep(index)}
-            >
-              <span>{move.index}</span>
-              <div><small>{move.equation}</small><strong>{move.title}</strong><p>{move.line}</p></div>
-              <ArrowRight size={20} />
-            </button>
-          ))}
-        </div>
-      </div>
+      <ScrollStack className={styles.standardScrollStack}>
+        {standardMoves.map((move) => <StandardStackCard key={move.id} move={move} />)}
+      </ScrollStack>
 
       <div className={styles.standardFoot}>
         <span><ShieldCheck size={14} /> MPL-HYBRID V1</span>
@@ -476,14 +383,27 @@ function Rewards() {
 
   return (
     <section className={styles.rewardsSection} id="rewards">
-      <div className={styles.rewardsIntro}>
+      <motion.div
+        className={styles.rewardsIntro}
+        initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.35 }}
+        transition={{ duration: reduceMotion ? 0 : 0.58, ease: [0.22, 1, 0.36, 1] }}
+      >
         <span className={styles.eyebrow}>THE 212 NETWORK</span>
         <h2>WORLDS PAY<br /><span>TOGETHER.</span></h2>
         <p>DO → VERIFY → OPEN.</p>
-      </div>
+      </motion.div>
 
       <div className={styles.rewardsGrid}>
-        <div className={styles.poolPanel} ref={flowRef}>
+        <motion.div
+          className={styles.poolPanel}
+          ref={flowRef}
+          initial={reduceMotion ? false : { opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: reduceMotion ? 0 : 0.55 }}
+        >
           <div className={styles.panelTopline}>
             <span><i /> SHARED REWARD VAULT</span>
             <b>CREATOR FUNDED</b>
@@ -513,9 +433,15 @@ function Rewards() {
           <div className={styles.poolEquation}>
             <span>WORLD A</span><i>+</i><span>WORLD B</span><i>+</i><span>WORLD C</span><b>→ 1 POOL</b>
           </div>
-        </div>
+        </motion.div>
 
-        <div className={styles.questPanel}>
+        <motion.div
+          className={styles.questPanel}
+          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: reduceMotion ? 0 : 0.55, delay: reduceMotion ? 0 : 0.08, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className={styles.panelTopline}>
             <span><i /> CAMPAIGN PREVIEW</span>
             <b>RULES PUBLIC</b>
@@ -556,9 +482,10 @@ function Rewards() {
               {dropOpen && (
                 <motion.div
                   className={styles.dropContents}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
+                  exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.25 }}
                 >
                   <span><Coins size={16} /> PARTNER TOKENS</span>
                   <span><Box size={16} /> WORLD NFTS</span>
@@ -569,7 +496,7 @@ function Rewards() {
           </div>
 
           <small className={styles.conceptNote}>CONCEPT UI · X OAUTH + ONCHAIN VERIFICATION REQUIRED</small>
-        </div>
+        </motion.div>
       </div>
     </section>
   )
@@ -581,32 +508,52 @@ function WorldCard({
   title,
   equation,
   visual,
+  delay = 0,
 }: {
   href: string
   status: string
   title: string
   equation: string
   visual: ReactNode
+  delay?: number
 }) {
+  const reduceMotion = useReducedMotion()
+
   return (
-    <SpotlightCard className={styles.worldCard} spotlightColor="rgba(183, 255, 50, 0.12)">
-      <Link href={href}>
-        <div className={styles.worldStatus}><span><i /> {status}</span><ArrowUpRight size={17} /></div>
-        <div className={styles.worldVisual}>{visual}</div>
-        <div className={styles.worldCopy}><small>{equation}</small><strong>{title}</strong></div>
-      </Link>
-    </SpotlightCard>
+    <motion.div
+      className={styles.worldCardMotion}
+      initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.985 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.24 }}
+      transition={{ duration: reduceMotion ? 0 : 0.52, delay: reduceMotion ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <SpotlightCard className={styles.worldCard} spotlightColor="rgba(183, 255, 50, 0.12)">
+        <Link href={href}>
+          <div className={styles.worldStatus}><span><i /> {status}</span><ArrowUpRight size={17} /></div>
+          <div className={styles.worldVisual}>{visual}</div>
+          <div className={styles.worldCopy}><small>{equation}</small><strong>{title}</strong></div>
+        </Link>
+      </SpotlightCard>
+    </motion.div>
   )
 }
 
 function Worlds() {
+  const reduceMotion = useReducedMotion()
+
   return (
     <section className={styles.worldsSection} id="worlds">
-      <div className={styles.worldsIntro}>
+      <motion.div
+        className={styles.worldsIntro}
+        initial={reduceMotion ? false : { opacity: 0, y: 22 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.32 }}
+        transition={{ duration: reduceMotion ? 0 : 0.58, ease: [0.22, 1, 0.36, 1] }}
+      >
         <span className={styles.eyebrow}>WORLDS ON 212</span>
         <h2>CHECK THE VAULT.<br /><span>THEN ENTER.</span></h2>
         <Link href="/create">LAUNCH YOURS <ArrowRight size={17} /></Link>
-      </div>
+      </motion.div>
 
       <div className={styles.worldGrid}>
         <WorldCard
@@ -614,6 +561,7 @@ function Worlds() {
           status="TESTED · DEVNET"
           title="PROTOCOL CANARY"
           equation="1 ERTEST ⇄ 1 NFT"
+          delay={reduceMotion ? 0 : 0}
           visual={<div className={styles.canaryVisual}><Zap size={25} /><b>101</b><small>LOOPS</small></div>}
         />
         <WorldCard
@@ -621,6 +569,7 @@ function Worlds() {
           status="BLUEPRINT"
           title="THE HOLLOW"
           equation="CONFIGURATION PENDING"
+          delay={reduceMotion ? 0 : 0.1}
           visual={
             <div className={styles.nftFan}>
               {[1, 2, 3].map((item) => (
@@ -634,12 +583,19 @@ function Worlds() {
           status="FOUNDING SLOT"
           title="YOUR WORLD"
           equation="YOUR TOKEN ⇄ YOUR FORMS"
+          delay={reduceMotion ? 0 : 0.2}
           visual={<div className={styles.openWorldVisual}><span>+</span><small>OPEN<br />SLOT</small></div>}
         />
       </div>
 
       <div className={styles.creatorBanner}>
-        <div className={styles.creatorCopy}>
+        <motion.div
+          className={styles.creatorCopy}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: reduceMotion ? 0 : 0.56, ease: [0.22, 1, 0.36, 1] }}
+        >
           <span className={styles.eyebrow}>CREATOR FORGE</span>
           <h2>BRING THE COIN.<br /><span>BUILD THE WORLD.</span></h2>
           <div className={styles.creatorRail}>
@@ -649,14 +605,21 @@ function Worlds() {
             <Link className={styles.primaryButton} href="/create">OPEN THE FORGE <ArrowUpRight size={18} /></Link>
             <Link className={styles.secondaryButton} href="/pump">CHECK TOKEN <ArrowRight size={18} /></Link>
           </div>
-        </div>
+        </motion.div>
 
-        <div className={styles.makerVisual} aria-hidden="true">
+        <motion.div
+          className={styles.makerVisual}
+          aria-hidden="true"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: reduceMotion ? 0 : 0.62, delay: reduceMotion ? 0 : 0.08 }}
+        >
           <span className={styles.makerHalo} />
           <i className={styles.makerScan} />
           <Image src="/images/electric-relic/brand/maker-idle.png" alt="" fill sizes="(max-width: 760px) 260px, 430px" />
           <div><small>THE MAKER</small><strong>WORLD 000 / READY</strong></div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )
