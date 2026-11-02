@@ -1,0 +1,25 @@
+{
+  "name": "Witness Portraits #08 - Camel-Driver",
+  "symbol": "WITNESS",
+  "description": "Caravan driver with a sand scarf over his mouth, a camel head beside him at sunset. PLACEHOLDER art; final hand-drawn pixel portrait pending. Devnet only, no mainnet value.",
+  "image": "https://electric-relic.vercel.app/witness-portraits/images/08-camel-driver.svg",
+  "external_url": "https://electric-relic.vercel.app/world/witness-portraits",
+  "attributes": [
+    {
+      "trait_type": "Role",
+      "value": "Camel-Driver"
+    },
+    {
+      "trait_type": "Era",
+      "value": "Ancient Near East"
+    },
+    {
+      "trait_type": "Art status",
+      "value": "Placeholder"
+    },
+    {
+      "trait_type": "Network",
+      "value": "devnet"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Witness Portraits #06 - Spice Merchant",
+  "symbol": "WITNESS",
+  "description": "Turbaned merchant with rings and a small brass scale, sacks of saffron and cumin. PLACEHOLDER art; final hand-drawn pixel portrait pending. Devnet only, no mainnet value.",
+  "image": "https://electric-relic.vercel.app/witness-portraits/images/06-spice-merchant.svg",
+  "external_url": "https://electric-relic.vercel.app/world/witness-portraits",
+  "attributes": [
+    {
+      "trait_type": "Role",
+      "value": "Spice Merchant"
+    },
+    {
+      "trait_type": "Era",
+      "value": "Ancient Near East"
+    },
+    {
+      "trait_type": "Art status",
+      "value": "Placeholder"
+    },
+    {
+      "trait_type": "Network",
+      "value": "devnet"
+    }
+  ]
+}

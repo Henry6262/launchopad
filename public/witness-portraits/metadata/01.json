@@ -1,0 +1,25 @@
+{
+  "name": "Witness Portraits #01 - Woman with the Clay Jar",
+  "symbol": "WITNESS",
+  "description": "Dark-haired woman in a brown robe with a copper earring, carrying a clay water jar. PLACEHOLDER art; final hand-drawn pixel portrait pending. Devnet only, no mainnet value.",
+  "image": "https://electric-relic.vercel.app/witness-portraits/images/01-woman-with-jar.svg",
+  "external_url": "https://electric-relic.vercel.app/world/witness-portraits",
+  "attributes": [
+    {
+      "trait_type": "Role",
+      "value": "Woman with the Clay Jar"
+    },
+    {
+      "trait_type": "Era",
+      "value": "Ancient Near East"
+    },
+    {
+      "trait_type": "Art status",
+      "value": "Placeholder"
+    },
+    {
+      "trait_type": "Network",
+      "value": "devnet"
+    }
+  ]
+}

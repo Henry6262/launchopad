@@ -1,0 +1,25 @@
+{
+  "name": "Witness Portraits #10 - Scribe's Apprentice",
+  "symbol": "WITNESS",
+  "description": "Young apprentice with a reed stylus and a cracked practice tablet. PLACEHOLDER art; final hand-drawn pixel portrait pending. Devnet only, no mainnet value.",
+  "image": "https://electric-relic.vercel.app/witness-portraits/images/10-scribes-apprentice.svg",
+  "external_url": "https://electric-relic.vercel.app/world/witness-portraits",
+  "attributes": [
+    {
+      "trait_type": "Role",
+      "value": "Scribe's Apprentice"
+    },
+    {
+      "trait_type": "Era",
+      "value": "Ancient Near East"
+    },
+    {
+      "trait_type": "Art status",
+      "value": "Placeholder"
+    },
+    {
+      "trait_type": "Network",
+      "value": "devnet"
+    }
+  ]
+}
